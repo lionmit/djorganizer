@@ -5,14 +5,15 @@ sort_main_crate.py — Auto-sort script for Lionel Mitelpunkt's DJ library
 Classifies every file in your Main Crate into genre-based sub-folders
 under DJ_MUSIC/, using filename keyword analysis.
 
-VERSION 12 — v12 keyword batch applied (2026-03)
+VERSION 13 — v13 keyword batch applied (2026-03)
   Progress trajectory (3,776 tracks total):
     Baseline  → 26.3% INBOX (993 tracks)
     v7+v8     → 22.0% (831 tracks)
     v9        → 20.7% (781 tracks)
     v10       → 19.3% (730 tracks)
     v11       → 18.1% (683 tracks)  ← accent + underscore fixes
-    v12       → 16.4% (619 tracks)  ← current ✅ within 15–20% target
+    v12       → 16.4% (619 tracks)
+    v13       → 12.7% (480 tracks)  ← deep research on all 619 remaining INBOX
 
   Each version = one full analysis of INBOX + targeted keyword batch:
     • v7/v8: 80+ artists across all genres (993-track INBOX)
@@ -20,6 +21,7 @@ VERSION 12 — v12 keyword batch applied (2026-03)
     • v10:   rock, pop, classics, world expansion
     • v11:   accent fixes (marías, jhené), underscore variants, 50+ artists
     • v12:   60+ artists + song-title keywords + underscore/accent fixes
+    • v13:   150+ keywords — deep research on all 619 remaining INBOX tracks
 
   DJ setup: Pioneer DDJ-FLX4, Rekordbox 7
 
@@ -199,6 +201,9 @@ GENRE_RULES = [
         "ninet ",                 # Ninet Tayeb — Israeli singer (Tfilati, Bo) — trailing space
         "ben el tavori",          # Ben El Tavori — Israeli Mizrahi pop (Shir Meyuchad)
         "zafrir ifrach",          # Zafrir Ifrach — Israeli musician
+        # ─ Added v13: Israeli artists from INBOX analysis ─
+        "basimlah",               # BaSimlah Aduma — Israeli band
+        "dr casper",              # Dr. Casper — Israeli hip-hop/electronic artist
     ]),
 
     # ── Hip-Hop & R&B ─────────────────────────────────────────────────────────
@@ -392,6 +397,22 @@ GENRE_RULES = [
         "gin and juice",          # Snoop Dogg classic (1993) — song title keyword for filename-only tracks
         "jeshi",                  # UK rapper (Universal Credit, 3310)
         "the rza",                # Wu-Tang Clan producer / rapper (Wu-Tang Clan Ain't Nuthing ta F' Wit)
+        # ─ Added v13: hip-hop artists & song titles from INBOX analysis ─
+        "bodak yellow",           # Cardi B hit — title keyword
+        "gravel pit",             # Wu-Tang Clan track — title keyword
+        "jump around",            # House of Pain — title keyword
+        "nappy roots",            # Southern hip-hop (Po' Folks, Good Day)
+        "khia ",                  # US hip-hop/crunk (My Neck My Back) — trailing space
+        "dj chose",               # Houston hip-hop producer
+        "earthgang",              # Atlanta hip-hop duo (Mirrorland)
+        "shnekel",                # Israeli hip-hop artist
+        "skero ",                 # Austrian rapper (Kabipp) — trailing space
+        "die atzen",              # German party rap duo (Disco Pogo)
+        "frauenarzt",             # German rapper
+        "manny marc",             # German rapper (Frauenarzt collaborator)
+        "sdp ",                   # German hip-hop duo — trailing space
+        "opm ",                   # US rap-rock (Heaven Is a Halfpipe) — trailing space
+        "rollin'",                # Limp Bizkit / other hip-hop title keyword
     ]),
 
     # ── Latin ─────────────────────────────────────────────────────────────────
@@ -477,6 +498,15 @@ GENRE_RULES = [
         "nina sky",               # Puerto Rican duo (Move Ya Body)
         "kat deluna", "kat de luna",  # Dominican-American singer (Whine Up)
         "los autenticos decadentes",  # Argentine rock en español / cumbia
+        # ─ Added v13: Latin artists from INBOX analysis ─
+        "konshens",               # Jamaican dancehall/reggaeton crossover
+        "rupee ",                 # Barbadian soca/dancehall (Tempted to Touch) — trailing space
+        "lil bitts",              # Latin-electronic crossover
+        "sergio mendes",          # Brazilian bossa nova/pop (Mas Que Nada)
+        "chingon",                # Mexican rock/Latin (Mexican Spaghetti Western, Machete OST)
+        "delfina dib",            # Argentine singer-songwriter
+        "ludmilla",               # Brazilian funk/pop singer (Tipo Crazy)
+        "berimbau",               # Brazilian instrument / title keyword (Astrud Gilberto)
     ]),
 
     # ── House & Dance ─────────────────────────────────────────────────────────
@@ -678,6 +708,76 @@ GENRE_RULES = [
         "john morales",             # NYC house remixer — M+M Mixes (Ain't Nobody, I Need You Now)
         "dj spen",                  # Baltimore house DJ/producer (Nite Life, Joy)
         "will clarke ",             # UK house/techno producer (Good Lemonade, Our Love) — trailing space
+        # ─ Added v13: house artists & song titles from INBOX analysis ─
+        "michelle weeks",           # US house vocalist (The Light, Don't Give Up)
+        "djane housekat",           # German DJ (My Party, All the Time)
+        "housekat",                 # short variant
+        "agatino romero",           # German/Italian house DJ
+        "bruno martini",            # Brazilian house/dance producer (Hear Me Now)
+        "breach ",                  # UK deep house producer (Jack) — trailing space
+        "bodybangers",              # German house/dance production team
+        "chelina manuhutu",         # Dutch house DJ
+        "chris lorenzo",            # UK bass house producer (California Dreamin')
+        "croatia squad",            # German house duo (The D Machine)
+        "combustibles",             # House/electronic project
+        "criminal vibes",           # European house producer
+        "dombresky",                # French house/tech producer (Bubblin')
+        "funkatron",                # Funky house producer
+        "gamper ",                  # Austrian house DJ (Gamper & Dadoni) — trailing space
+        "krystal klear",            # Irish house/disco DJ
+        "laserkraft",               # German house/electro duo (Laserkraft 3D — Nein Mann)
+        "lee foss",                 # US house DJ (Hot Creations label)
+        "lil' louis",               # Chicago house pioneer (French Kiss)
+        "lil louis",                # variant without apostrophe
+        "mobin master",             # Australian house producer
+        "me & my toothbrush",       # European house duo
+        "michael mind",             # German house producer (Michael Mind Project)
+        "mike candys",              # Swiss house DJ (Together Again)
+        "nari & milani",            # Italian house DJs
+        "cristian marchi",          # Italian house DJ/producer
+        "never dull",               # South African house/disco producer
+        "picard brothers",          # French disco-house duo
+        "san pacho",                # Colombian house/tech house producer
+        "toomanylefthands",         # Danish house duo
+        "vato gonzalez",            # Dutch house DJ (Badman Riddim)
+        "jolyon petch",             # Australian house/dance DJ
+        "masteria",                 # House producer
+        "babert",                   # French disco-house producer
+        "mell hall",                # Australian house/disco producer
+        "black loops",              # Spanish house/minimal producer
+        "youandewan",               # UK deep house producer
+        "fort romeau",              # UK deep house/electronic producer
+        "drinks on me",             # House/R&B crossover artist
+        "david versace",            # Australian house DJ
+        "tenshu",                   # House/bass producer
+        "kdyn",                     # House/electronic artist
+        "harrison bdp",             # UK house/breakbeat producer
+        "ootoro",                   # Electronic/house producer
+        "cortese",                  # Italian house project
+        "argy ",                    # Greek house/techno DJ — trailing space
+        "darius & finlay",          # German house duo (Tropicali)
+        "dj sammy",                 # Spanish Eurodance/house DJ (Heaven)
+        "french affair",            # German-French house pop (My Heart Goes Boom)
+        "martin jensen",            # Danish house/future bass DJ (Solo Dance)
+        "remady",                   # Swiss house DJ
+        "lothief",                  # House/melodic techno artist
+        "sam shure",                # Israeli-German melodic house producer
+        "audiosonik",               # European house DJ
+        u"d\u00e9but de soir\u00e9e",  # French disco/pop (Nuit de Folie)
+        "debut de soiree",          # ASCII variant
+        "lika morgan",              # German house/vocal pop (Feel the Same)
+        "franky wah",               # UK progressive house DJ
+        "john summit",              # US house/tech house producer (Deep End)
+        "jean tonique",             # French house/disco producer
+        "braga circuit",            # House/electronic project
+        "herr krank",               # European house/techno producer
+        "delroy edwards",           # US house/dance producer (L.I.E.S. label)
+        "stazzia",                  # House/dance vocalist
+        "douvelle",                 # House/electronic artist
+        "100% pure love",           # Crystal Waters title keyword (1994)
+        "the bomb ",                # Bucketheads title keyword (The Bomb) — trailing space
+        "the business",             # Tiësto title keyword (The Business, 2020)
+        "blackwater",               # Octave One title keyword (Blackwater, 2001)
     ]),
 
     # ── Electronic / Psytrance / Techno ───────────────────────────────────────
@@ -909,6 +1009,31 @@ GENRE_RULES = [
         "taiki nulight",          # UK DnB/bass-house producer (Spit, Get Low)
         "serial killaz",          # UK drum & bass duo (Warzone, Time Flies)
         "peaches ",               # Canadian electroclash artist (Fuck the Pain Away, Boys Wanna Be Her) — trailing space
+        # ─ Added v13: electronic artists from INBOX analysis ─
+        "frederic robinson",      # UK liquid DnB / electronic producer
+        "yosi horikawa",          # Japanese experimental electronic (Bubbles, Wandering)
+        "pilocka krach",          # German experimental electronic
+        "etienne jaumet",         # French electronic/synth artist (Night Music)
+        "hucci",                  # Australian trap/electronic producer
+        "koreless",               # Welsh electronic producer (Sun, 4D)
+        "fasme",                  # French electronic/pop artist
+        "cirqular",               # Electronic/bass music producer
+        "subb theory",            # UK dubstep/electronic producer
+        "neuroplasm",             # Electronic/psychedelic bass artist
+        "tentendo",               # Electronic/ambient producer
+        "stussko",                # Electronic producer
+        "deekapz",                # Electronic/bass producer
+        "sandhog",                # Electronic artist
+        "coro ",                  # Electronic project — trailing space
+        "delerium",               # Canadian ambient/electronic (Silence ft. Sarah McLachlan)
+        "neil cicierega",         # US mashup/electronic (Mouth Sounds, Mouth Moods)
+        "passion fruit ",         # Electronic/dance act — trailing space
+        "alexander marcus",       # German electrolore artist (Hawaii Toast Song)
+        "clipz",                  # UK drum & bass producer
+        "matrix & futurebound",   # UK drum & bass duo (Magnetic Eyes, Fire)
+        "outsiders & dickster",   # Psytrance duo
+        "tristan & bliss",        # Psytrance artists
+        "esg ",                   # NYC post-punk/electronic (UFO, My Love for You) — trailing space
     ]),
 
     # ── Rock & Alternative ────────────────────────────────────────────────────
@@ -1175,6 +1300,10 @@ GENRE_RULES = [
         "the marketts",           # 60s US garage/surf (Out of Limits, Batman Theme)
         "linkin par",             # Truncated Linkin Park filename variant
         "pacific gas & electric", # US blues-rock (Are You Ready, Wade in the Water)
+        # ─ Added v13: rock artists from INBOX analysis ─
+        "aliotta haynes",         # US folk-rock (Lake Shore Drive, 1971)
+        "crosby stills",          # Crosby, Stills, Nash & Young — keyword catches all variants
+        "the ex ",                # Dutch post-punk band — trailing space
     ]),
 
     # ── Pop & Commercial ──────────────────────────────────────────────────────
@@ -1454,6 +1583,18 @@ GENRE_RULES = [
         "the wind and the wave",  # US folk-pop duo (Happiness is Not a Place, Dog Days Are Over cover)
         "thirdstory",             # US R&B trio (Worth It, Foolish)
         "wild child ",            # Austin indie folk-pop (Crazy Bird, Pillow Talk) — trailing space
+        # ─ Added v13: pop artists & song titles from INBOX analysis ─
+        "i gotta feeling",        # Black Eyed Peas title keyword
+        "geri halliwell",         # UK pop (It's Raining Men, Mi Chico Latino)
+        "dan balan",              # Moldovan pop (Crazy Loop, Chica Bomb)
+        "gilbert montagne",       # French pop singer (On Va S'aimer)
+        "kimberose",              # French soul/pop (Chapter One)
+        "chesney hawkes",         # UK pop (I Am the One and Only)
+        "leslie grace",           # Dominican-American pop/Latin crossover
+        "ariana and the rose",    # US pop/electronic artist
+        u"m\u00f6we",            # Austrian pop/dance duo (Lovers)
+        "mowe ",                  # ASCII variant — trailing space
+        "us the duo",             # US pop duo (Missin You Like Crazy, No Matter Where You Are)
     ]),
 
     # ── Classics & Oldies ─────────────────────────────────────────────────────
@@ -1717,6 +1858,13 @@ GENRE_RULES = [
         "black lace",             # UK novelty/pop (Agadoo, 1983; Do the Conga)
         "baccara",                # Spanish pop duo (Yes Sir I Can Boogie, 1977)
         "stockard channing",      # Actress/singer — Grease (Look at Me, I'm Sandra Dee, 1978)
+        # ─ Added v13: classics artists from INBOX analysis ─
+        "daddy cool",             # Australian disco/pop (Eagle Rock, 1971)
+        "carrie lucas",           # US disco/soul (Dance With You, 1979)
+        "little nell",            # Australian actress/singer (Rocky Horror — Columbia)
+        "time warp",              # Rocky Horror Picture Show — title keyword
+        "love hangover",          # Diana Ross title keyword (1976 disco classic)
+        "woody thorne",           # UK disco/funk producer
         # ─ Classic genre terms ─
         "classic", "oldies", "golden hit", "evergreen",
         "60s ", "70s ", "80s ",
@@ -1866,6 +2014,12 @@ GENRE_RULES = [
         "the slickers",           # Jamaican reggae (Johnny Too Bad — The Harder They Come OST)
         "quantic",                # UK downtempo/world music producer (Time Is the Enemy, The 5th Exotic)
         "planet drum",            # Mickey Hart (Grateful Dead) world percussion project
+        # ─ Added v13: world artists from INBOX analysis ─
+        "athena ",                # Greek pop/rock band — trailing space
+        "bombo clat",             # World bass / dancehall crossover
+        "drumspyder",             # Ecstatic dance / world percussion producer
+        "enta omri",              # Arabic song title (Umm Kulthum classic — extra catchall)
+        "james asher",            # UK world music / new age percussionist
         # ─ Genre terms ─
         "world music", "global",
         "afro ", "african",
