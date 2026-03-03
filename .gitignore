@@ -1,0 +1,16 @@
+*.mp3
+*.flac
+*.wav
+*.aiff
+*.aif
+*.m4a
+*.ogg
+*.zip
+*.csv
+desktop.ini
+$RECYCLE.BIN/
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+
