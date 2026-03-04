@@ -5,7 +5,7 @@ sort_main_crate.py — Auto-sort script for Lionel Mitelpunkt's DJ library
 Classifies every file in your Main Crate into genre-based sub-folders
 under DJ_MUSIC/, using filename keyword analysis.
 
-VERSION 13 — v13 keyword batch applied (2026-03)
+VERSION 14 — v14 keyword batch applied (2026-03)
   Progress trajectory (3,776 tracks total):
     Baseline  → 26.3% INBOX (993 tracks)
     v7+v8     → 22.0% (831 tracks)
@@ -14,6 +14,7 @@ VERSION 13 — v13 keyword batch applied (2026-03)
     v11       → 18.1% (683 tracks)  ← accent + underscore fixes
     v12       → 16.4% (619 tracks)
     v13       → 12.7% (480 tracks)  ← deep research on all 619 remaining INBOX
+    v14       → 9.9%  (372 tracks)  ← 132 new keywords from exhaustive INBOX research
 
   Each version = one full analysis of INBOX + targeted keyword batch:
     • v7/v8: 80+ artists across all genres (993-track INBOX)
@@ -22,6 +23,7 @@ VERSION 13 — v13 keyword batch applied (2026-03)
     • v11:   accent fixes (marías, jhené), underscore variants, 50+ artists
     • v12:   60+ artists + song-title keywords + underscore/accent fixes
     • v13:   150+ keywords — deep research on all 619 remaining INBOX tracks
+    • v14:   132 keywords — exhaustive research on all 480 remaining INBOX tracks
 
   DJ setup: Pioneer DDJ-FLX4, Rekordbox 7
 
@@ -204,6 +206,10 @@ GENRE_RULES = [
         # ─ Added v13: Israeli artists from INBOX analysis ─
         "basimlah",               # BaSimlah Aduma — Israeli band
         "dr casper",              # Dr. Casper — Israeli hip-hop/electronic artist
+        # ─ Added v14: Israeli artists from deep INBOX research ─
+        "kafkaf",                 # Israeli artist
+        "- netta",                # Eurovision 2018 "Toy" — uses dash-prefix to avoid "estoy" false positive
+        "mifgash",                # Israeli artist/group
     ]),
 
     # ── Hip-Hop & R&B ─────────────────────────────────────────────────────────
@@ -413,6 +419,23 @@ GENRE_RULES = [
         "sdp ",                   # German hip-hop duo — trailing space
         "opm ",                   # US rap-rock (Heaven Is a Halfpipe) — trailing space
         "rollin'",                # Limp Bizkit / other hip-hop title keyword
+        # ─ Added v14: hip-hop/R&B song-title keywords ─
+        "bitch better have my money",  # Rihanna — title keyword
+        "1, 2 step",                   # Ciara feat. Missy Elliott — title keyword
+        "candy shop",                  # 50 Cent feat. Olivia — title keyword
+        "e.i.",                        # Nelly — title keyword
+        "g.o.m.d.",                    # J. Cole — title keyword
+        "get busy",                    # Sean Paul — title keyword
+        "goosebumps",                  # Travis Scott feat. Kendrick — title keyword
+        "i just had sex",              # The Lonely Island feat. Akon
+        "industry baby",               # Lil Nas X feat. Jack Harlow
+        "like a g6",                   # Far East Movement feat. DEV
+        "paper planes",                # M.I.A. — title keyword
+        "run the world",               # Beyoncé — title keyword
+        "nice for what",               # Drake — title keyword
+        "wild thing",                  # Tone Loc — title keyword
+        "half moghul",                 # artist
+        "freddy madball",              # artist
     ]),
 
     # ── Latin ─────────────────────────────────────────────────────────────────
@@ -507,6 +530,18 @@ GENRE_RULES = [
         "delfina dib",            # Argentine singer-songwriter
         "ludmilla",               # Brazilian funk/pop singer (Tipo Crazy)
         "berimbau",               # Brazilian instrument / title keyword (Astrud Gilberto)
+        # ─ Added v14: Latin artists from deep INBOX research ─
+        "calito",                      # artist
+        "carnavalera",                 # artist
+        "color esperanza",             # song title keyword
+        "muchachos",                   # artist/group
+        u"trio vegabaje\u00f1o",        # artist group (ñ)
+        "rebelde way",                 # Argentine band/show soundtrack
+        u"joaqu\u00edn cornejo",        # artist (í)
+        "dj scuff",                    # Latin DJ/producer
+        "nando boom",                  # artist
+        "dj bruno prado",              # artist
+        "pa mayte",                    # artist
     ]),
 
     # ── House & Dance ─────────────────────────────────────────────────────────
@@ -778,6 +813,23 @@ GENRE_RULES = [
         "the bomb ",                # Bucketheads title keyword (The Bomb) — trailing space
         "the business",             # Tiësto title keyword (The Business, 2020)
         "blackwater",               # Octave One title keyword (Blackwater, 2001)
+        # ─ Added v14: House artists from deep INBOX research ─
+        "tapesh",                      # house artist
+        "dayne s",                     # house artist
+        "cid & joshwa",                # house duo
+        "cid and joshwa",              # variant
+        "chagu",                       # house artist
+        "henrik schwarz",              # house DJ/producer
+        "bassboy",                     # house artist
+        "renart",                      # house artist
+        "michelle weeks",              # house vocalist
+        "bryn christopher",            # vocalist
+        "alors on danse",              # Stromae — title keyword
+        "drinkee",                     # Sofi Tukker — title keyword
+        "ed marquis",                  # house artist
+        "estoy feliz",                 # house track
+        "gta ",                        # house producer — trailing space
+        "feder ",                      # house producer — trailing space
     ]),
 
     # ── Electronic / Psytrance / Techno ───────────────────────────────────────
@@ -1034,6 +1086,30 @@ GENRE_RULES = [
         "outsiders & dickster",   # Psytrance duo
         "tristan & bliss",        # Psytrance artists
         "esg ",                   # NYC post-punk/electronic (UFO, My Love for You) — trailing space
+        # ─ Added v14: Electronic artists from deep INBOX research ─
+        "rikslyd",                     # electronic artist
+        "tom jarmey",                  # electronic artist
+        "choopsie",                    # electronic artist
+        "lcd soundsystem",             # electronic band
+        "tonite only",                 # electronic artist
+        "tobacco ",                    # electronic artist — trailing space
+        "oka ",                        # electronic artist — trailing space
+        "naoba",                       # electronic artist
+        "rigopolar",                   # electronic artist
+        "0303am",                      # electronic artist
+        "renan ferrari",               # electronic artist
+        "arling & cameron",            # electronic duo
+        "arling and cameron",          # variant
+        "giua",                        # electronic artist
+        "deekline",                    # electronic artist
+        "adi ulmansky",                # Israeli electronic
+        "ecstasis",                    # track keyword
+        "elation station",             # track keyword
+        "dubdogz",                     # electronic artist
+        "snollebo",                    # electronic artist
+        "numa ",                       # electronic artist — trailing space
+        "willem de roo",               # electronic artist
+        "polish ambassador",           # electronic artist
     ]),
 
     # ── Rock & Alternative ────────────────────────────────────────────────────
@@ -1304,6 +1380,18 @@ GENRE_RULES = [
         "aliotta haynes",         # US folk-rock (Lake Shore Drive, 1971)
         "crosby stills",          # Crosby, Stills, Nash & Young — keyword catches all variants
         "the ex ",                # Dutch post-punk band — trailing space
+        # ─ Added v14: Rock artists/songs from deep INBOX research ─
+        "the blasters",                # American rock band
+        "crosby,",                     # Crosby, Stills variant with comma
+        "bustin surfboards",           # surf rock track
+        "magic carpet ride",           # Steppenwolf — title keyword
+        "it's my life",                # Bon Jovi — title keyword
+        "two door cinema",             # Two Door Cinema Club
+        "crawling",                    # Linkin Park — title keyword
+        "nick cave",                   # Nick Cave & The Bad Seeds
+        "totally wired",               # The Fall — title keyword
+        "inner wave",                  # indie rock band
+        "slow emotion replay",         # The The — title keyword
     ]),
 
     # ── Pop & Commercial ──────────────────────────────────────────────────────
@@ -1595,6 +1683,22 @@ GENRE_RULES = [
         u"m\u00f6we",            # Austrian pop/dance duo (Lovers)
         "mowe ",                  # ASCII variant — trailing space
         "us the duo",             # US pop duo (Missin You Like Crazy, No Matter Where You Are)
+        # ─ Added v14: Pop artists/songs from deep INBOX research ─
+        "andreas bourani",             # German pop artist
+        "andrew belle",                # singer-songwriter
+        "agadou",                      # novelty track keyword
+        "eryn allen kane",             # R&B-pop artist
+        "nick mulvey",                 # singer-songwriter
+        "just dance",                  # Lady Gaga — title keyword
+        "make me feel",                # Janelle Monáe — title keyword
+        "good as hell",                # Lizzo — title keyword
+        "hold on, we're going home",   # Drake — title keyword
+        "shape of you",                # Ed Sheeran — title keyword
+        "somebody that i used to know", # Gotye — title keyword
+        "jonathan groff",              # singer/actor
+        "supercut",                    # Lorde — title keyword
+        "the louvre",                  # Lorde — title keyword
+        "temperature",                 # Sean Paul — title keyword
     ]),
 
     # ── Classics & Oldies ─────────────────────────────────────────────────────
@@ -1873,6 +1977,18 @@ GENRE_RULES = [
         "the definitive", "collection",
         "golden years", "retro ",
         "swing ", "big band", "jazz standard",
+        # ─ Added v14: Classics from deep INBOX research ─
+        "mozart",                      # composer
+        "commodores",                  # soul/funk legends
+        "bernard herrmann",            # film composer
+        "bread ",                      # 70s soft rock — trailing space
+        "james getzoff",               # composer/musician
+        "al hirt",                     # trumpet player
+        "luis bacalov",                # composer
+        "jack nitzsche",               # producer/composer
+        "delibes",                     # composer
+        "london starlight",            # orchestral group
+        "outlander",                   # soundtrack
     ]),
 
     # ── World & Ecstatic ──────────────────────────────────────────────────────
@@ -2027,6 +2143,15 @@ GENRE_RULES = [
         "didgeridoo", "native american",
         "deep forest", "enigma ",
         "world beat",
+        # ─ Added v14: World/ecstatic artists from deep INBOX research ─
+        "gcm",                         # artist
+        "khululuma",                   # artist
+        "eastern journey",             # artist/group
+        "james last",                  # orchestral arranger
+        "zamfir",                      # Romanian pan flute
+        "yemanjo",                     # artist
+        "guru singh",                  # spiritual musician
+        "omkara",                      # artist
     ]),
 
     # ── 11 Remixes (LAST rule — catches any remaining unclassified remixes) ──
@@ -2038,6 +2163,11 @@ GENRE_RULES = [
         "vip mix", "vip edit",
         "extended remix", "club remix",
         "bootleg remix",
+        # ─ Added v14: Remix labels from deep INBOX research ─
+        "the m0nster",                 # remix label
+        "mixmstrstel",                 # remix label
+        "maw mix",                     # remix variant
+        "super bowl anthem",           # track keyword
     ]),
 
 ]
