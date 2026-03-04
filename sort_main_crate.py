@@ -63,7 +63,7 @@ from collections import defaultdict
 # CONFIGURATION — edit these paths if yours differ
 # ─────────────────────────────────────────────────────────────────────────────
 
-MAIN_CRATE    = Path("/Users/Lionmit/Music/Main Crate")
+MAIN_CRATE    = Path("/Users/Lionmit/Music/DJ_MUSIC/00_INBOX")
 DJ_MUSIC_ROOT = Path("/Users/Lionmit/Music/DJ_MUSIC")
 
 # Folder names inside DJ_MUSIC_ROOT
