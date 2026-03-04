@@ -5,7 +5,7 @@ sort_main_crate.py — Auto-sort script for Lionel Mitelpunkt's DJ library
 Classifies every file in your Main Crate into genre-based sub-folders
 under DJ_MUSIC/, using filename keyword analysis.
 
-VERSION 14 — v14 keyword batch applied (2026-03)
+VERSION 16 — v16 keyword batch applied (2026-03)
   Progress trajectory (3,776 tracks total):
     Baseline  → 26.3% INBOX (993 tracks)
     v7+v8     → 22.0% (831 tracks)
@@ -15,6 +15,8 @@ VERSION 14 — v14 keyword batch applied (2026-03)
     v12       → 16.4% (619 tracks)
     v13       → 12.7% (480 tracks)  ← deep research on all 619 remaining INBOX
     v14       → 9.9%  (372 tracks)  ← 132 new keywords from exhaustive INBOX research
+    v15       → 8.0%  (301 tracks)  ← 93 new keywords from deep INBOX research
+    v16       → 4.4%  (167 tracks)  ← 133 new keywords from exhaustive INBOX research
 
   Each version = one full analysis of INBOX + targeted keyword batch:
     • v7/v8: 80+ artists across all genres (993-track INBOX)
@@ -24,6 +26,8 @@ VERSION 14 — v14 keyword batch applied (2026-03)
     • v12:   60+ artists + song-title keywords + underscore/accent fixes
     • v13:   150+ keywords — deep research on all 619 remaining INBOX tracks
     • v14:   132 keywords — exhaustive research on all 480 remaining INBOX tracks
+    • v15:   93 keywords — deep research on all 372 remaining INBOX tracks
+    • v16:   133 keywords — exhaustive research on all 301 remaining INBOX tracks
 
   DJ setup: Pioneer DDJ-FLX4, Rekordbox 7
 
@@ -211,6 +215,8 @@ GENRE_RULES = [
         "- netta",                # Eurovision 2018 "Toy" — uses dash-prefix to avoid "estoy" false positive
         "mifgash",                # Israeli artist/group
         "dale promo",                    # Noa Kirel — Israeli artist
+        "toy - israel",                  # TOY — Eurovision 2018 Israeli entry
+        "buttering trio",                # Buttering Trio — Israeli jazz-funk
     ]),
 
     # ── Hip-Hop & R&B ─────────────────────────────────────────────────────────
@@ -454,6 +460,18 @@ GENRE_RULES = [
         "imma be",                       # Black Eyed Peas — title keyword
         "get ugly",                      # Jason Derulo — title keyword
         "tambourine",                    # Eve — hip-hop track
+        "hateu",                         # Mariah Carey — R&B
+        "lite weight",                   # Anderson .Paak — hip-hop
+        "all the stars",                 # Kendrick Lamar & SZA — hip-hop
+        "ms banks",                      # Ms Banks — UK rapper
+        "allan rayman",                  # Allan Rayman — R&B
+        "kiss me more",                  # Doja Cat ft. SZA — hip-hop/pop
+        "milkshake",                     # Kelis — R&B/hip-hop
+        "ring the alarm",                # Beyoncé — R&B
+        "nails, hair",                   # Todrick Hall — hip-hop
+        "level up",                      # Ciara — hip-hop/pop
+        "lose control",                  # Missy Elliott — hip-hop
+        "step up",                       # Step Up OST — hip-hop
     ]),
 
     # ── Latin ─────────────────────────────────────────────────────────────────
@@ -564,6 +582,8 @@ GENRE_RULES = [
         "mas maiz",                      # Latin track
         "chu chu ua",                    # children's Latin dance song
         "scubba",                        # Scubba — Latin-jazz covers
+        "radio luna",                    # Radio Luna — Latin band
+        "cuentame",                      # Stan Sax / Mirta — Latin
     ]),
 
     # ── House & Dance ─────────────────────────────────────────────────────────
@@ -875,6 +895,24 @@ GENRE_RULES = [
         "if it ain't love",              # house track
         "we wanna party",                # TJR — house
         "don't wanna go home",           # Jason Derulo — dance-pop
+        "sweet lovin",                   # Sigala — house
+        "mufasa",                        # Riton x Nightcrawlers — house
+        "just kiddin",                   # Just Kiddin — house duo
+        "in da getto",                   # J Balvin & Skrillex — dance
+        "praise you",                    # Fatboy Slim — house classic
+        "rhythm is a dancer",            # Snap! — eurodance/house
+        "kia love",                      # Kia Love — house vocalist
+        "mallin",                        # Mallin — house producer
+        "vula",                          # house vocalist (Turn Me On)
+        "ray chris",                     # Ray Chris — vocal dance
+        "baian",                         # Bakermat — Baianá house
+        "gonna_get_you",                 # 90s house — I'm Gonna Get You
+        "the sponges",                   # The Sponges — funk/house
+        "tuxedo",                        # Tuxedo — funk/house duo
+        "titanium",                      # David Guetta — dance
+        "karen_harding",                 # Karen Harding — house vocal
+        "alaia",                         # Alaia & Gallo — house
+        "yowsah",                        # CHIC — Dance Dance Dance
     ]),
 
     # ── Electronic / Psytrance / Techno ───────────────────────────────────────
@@ -1168,6 +1206,53 @@ GENRE_RULES = [
         "joost ",                        # Joost — electronic/pop
         "bomel",                         # Bomel — electronic edit
         "superheld",                     # Rob & Chris — electronic
+        "aerodynamite",                  # Daft Punk — electronic
+        "dubtazer",                      # Dubtazer — psy-dub
+        "hohm",                          # Hohm — electronic
+        "hxrt",                          # HXRT — electronic
+        "mou5zyzz",                      # Mou5ZyZZ — electronic
+        "aiio",                          # Mr.Aiio — electronic
+        "møme",                          # Møme — French electronic
+        "insomnia",                      # Faithless — electronic classic
+        "parallells",                    # Parallells — electronic
+        "sp3ctrum",                      # SP3CTRUM — electronic
+        "psyched3lic",                   # Psyched3lic — electronic
+        "peace sine",                    # Peace Sine — electronic
+        "trainman",                      # The Trainman — electronic
+        "tambour battant",               # Tambour Battant — French electronic
+        "vurt",                          # Vurt — electronic
+        "nowifi",                        # nowifi — electronic
+        "intr0beatz",                    # Intr0beatz — electronic
+        "tony shades",                   # Tony Shades — electronic
+        "orenda",                        # Orenda — electronic
+        "umbilical moonrise",            # Umbilical Moonrise — electronic
+        "with you friends",              # Skrillex — electronic
+        "art school girlfriend",         # Art School Girlfriend — electronic
+        "hundred waters",                # Hundred Waters — electronic
+        "tkdjs",                         # TKDJS — electronic
+        "tabasco project",               # Black Tabasco Project — electronic
+        "levyticus",                     # LEVYTICUS — electronic
+        "life of dillon",                # Life of Dillon — electronic
+        "lo wolf",                       # Lo Wolf — electronic
+        "j ember",                       # j ember — electronic
+        "jaykode",                       # JayKode — electronic
+        "excentric",                     # Excentric — electronic
+        "highbloo",                      # Highbloo — electronic
+        "nokturn",                       # Nokturn — electronic
+        "antois",                        # Antois — electronic
+        "countach",                      # Countach — Italo-disco/electronic
+        "shadow age",                    # Shadow Age — electronic
+        "autumn glow",                   # Autumn Glow — electronic
+        "bliss looper",                  # Bliss Looper — electronic
+        "siren tourist",                 # Siren Tourist — electronic
+        "acheless",                      # Acheless — electronic
+        "cardiac half",                  # Cardiac Half — electronic
+        "claraty",                       # Claraty — electronic
+        "chillstep",                     # chillstep — electronic genre tag
+        "dolce tiva",                    # Dolce Tiva — electronic
+        "benji lewis",                   # Benji Lewis — electronic/indie
+        "koni ",                         # Koni — electronic (trailing space)
+        "rob & chris",                   # Rob & Chris — electronic
     ]),
 
     # ── Rock & Alternative ────────────────────────────────────────────────────
@@ -1455,6 +1540,11 @@ GENRE_RULES = [
         "toten ",                        # Die Toten — German punk-rock
         "lewis del mar",                 # Lewis Del Mar — indie rock
         "magic city hippies",            # Magic City Hippies — indie rock
+        "#1 dads",                       # #1 Dads — Australian indie
+        "l'rain",                        # L'Rain — experimental rock
+        "ainslie wills",                 # Ainslie Wills — indie rock
+        "old sea brigade",               # Old Sea Brigade — indie rock
+        "heart-",                        # Heart — rock band (filename variant)
     ]),
 
     # ── Pop & Commercial ──────────────────────────────────────────────────────
@@ -1776,6 +1866,19 @@ GENRE_RULES = [
         "we saw lions",                  # We Saw Lions — indie pop
         "coca-cola anthem",              # FIFA 2018 anthem
         "colors ",                       # Colors anthem — pop
+        "you'll be back",                # Hamilton — musical/pop
+        "i know him",                    # Hamilton — musical/pop
+        "let it go",                     # Frozen — Disney pop
+        "leisure ",                      # LEISURE — indie pop (trailing space)
+        "koosen",                        # Koosen — indie pop
+        "madison ryann",                 # Madison Ryann Ward — pop
+        "acid dreams",                   # MAX & Felly — pop
+        "katerine",                      # Katerine — French pop
+        "healy",                         # Healy — indie pop
+        "kai straw",                     # Kai Straw — indie pop
+        "one and only",                  # Chesney Hawkes — pop classic
+        "jason weaver",                  # Jason Weaver — Lion King pop
+        "boy - railway",                 # Boy — indie pop
     ]),
 
     # ── Classics & Oldies ─────────────────────────────────────────────────────
@@ -2070,6 +2173,20 @@ GENRE_RULES = [
         "lesley gore",                   # Lesley Gore — classic pop
         "buchanan brothers",             # Buchanan Brothers — classics
         "happy birthday",                # classic song
+        "everybody's gotta live",        # Love — 1960s classic
+        "between clark",                 # Love — 1960s classic
+        "my little red book",            # Love — 1960s classic
+        "david hess",                    # David Hess — 1970s film music
+        "hot stuff",                     # Donna Summer — disco classic
+        "chad & jeremy",                 # Chad & Jeremy — 1960s pop
+        "robert corff",                  # Robert Corff — 1970s film
+        "zed's dead",                    # Pulp Fiction — film classic
+        "bring out the gimp",            # Pulp Fiction — film classic
+        "pumpkin and honey",             # Pulp Fiction — film classic
+        "jack rabbit slim",              # Pulp Fiction — film classic
+        "son of a lovin",                # Once Upon a Time in Hollywood OST
+        "you got the funk",              # classic funk
+        "paxton quigley",                # Chad & Jeremy — 1960s classic
     ]),
 
     # ── World & Ecstatic ──────────────────────────────────────────────────────
@@ -2240,6 +2357,14 @@ GENRE_RULES = [
         "danit ",                        # Danit — world music
         "xenia ",                        # Xenia — Portuguese/world
         "palenque",                      # Palenque Records — Colombian world
+        "o.b.f",                         # O.B.F — dub/world
+        "jpattersson",                   # JPattersson — world-electronic
+        "shakti bliss",                  # Shakti Bliss — world/yoga
+        "dj drez",                       # DJ Drez — world/yoga
+        "climbing poetree",              # Climbing PoeTree — world/spoken
+        "vision dojo",                   # Vision Dojo — world-electronic
+        "human experience",              # The Human Experience — world
+        "شارموفرز",                      # Sharmoofers — Egyptian band (Arabic)
     ]),
 
     # ── 11 Remixes (LAST rule — catches any remaining unclassified remixes) ──
@@ -2261,6 +2386,18 @@ GENRE_RULES = [
         "swick",                         # Swick — remix producer
         "peer kusiv",                    # Peer Kusiv — remix/edit
         "rauschhaus",                    # Rauschhaus — remix/edit
+        "corvyn",                        # Alixandrea Corvyn — cover artist
+        "lanie gardner",                 # Lanie Gardner — cover artist
+        "regrooved",                     # Parker — regrooved remix
+        "call me maybe",                 # cover/remix version
+        "milla knight",                  # Milla Knight — cover artist
+        "shemce",                        # Shemce — cover artist
+        "baseballs",                     # The Baseballs — cover band
+        "funk hunters",                  # Funk Hunters — remix
+        "remint",                        # DC's Finest — Remint remix
+        "cimorelli",                     # Cimorelli — cover group
+        "krik",                          # KRIK — remix/cover
+        "matias deago",                  # Matias Deago — bootleg remix
     ]),
 
 ]
