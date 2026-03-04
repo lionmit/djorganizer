@@ -210,6 +210,7 @@ GENRE_RULES = [
         "kafkaf",                 # Israeli artist
         "- netta",                # Eurovision 2018 "Toy" — uses dash-prefix to avoid "estoy" false positive
         "mifgash",                # Israeli artist/group
+        "dale promo",                    # Noa Kirel — Israeli artist
     ]),
 
     # ── Hip-Hop & R&B ─────────────────────────────────────────────────────────
@@ -436,6 +437,23 @@ GENRE_RULES = [
         "wild thing",                  # Tone Loc — title keyword
         "half moghul",                 # artist
         "freddy madball",              # artist
+        "antwoord",                      # Die Antwoord — South African hip-hop
+        "formation",                     # Beyoncé — hip-hop single
+        "madcon",                        # Madcon — hip-hop/pop duo
+        "stallion",                      # Megan Thee Stallion
+        "yung joc",                      # Yung Joc — rapper
+        "it's goin' down",               # Yung Joc — title keyword
+        "lotto boyzz",                   # UK hip-hop group
+        "mr eazi",                       # Nigerian/UK afrobeats-hiphop
+        "vamummtn",                      # Die Vamummtn — Austrian hip-hop
+        "sumit ",                        # Sumit — hip-hop artist
+        "fort knox five",                # funk/hip-hop collective
+        "the way you move",              # OutKast — title keyword
+        "the sky's the limit",           # Notorious BIG — title keyword
+        "7_11",                          # Beyoncé — 7/11
+        "imma be",                       # Black Eyed Peas — title keyword
+        "get ugly",                      # Jason Derulo — title keyword
+        "tambourine",                    # Eve — hip-hop track
     ]),
 
     # ── Latin ─────────────────────────────────────────────────────────────────
@@ -542,6 +560,10 @@ GENRE_RULES = [
         "nando boom",                  # artist
         "dj bruno prado",              # artist
         "pa mayte",                    # artist
+        "veneno de serpiente",           # Kevo DJ — Latin
+        "mas maiz",                      # Latin track
+        "chu chu ua",                    # children's Latin dance song
+        "scubba",                        # Scubba — Latin-jazz covers
     ]),
 
     # ── House & Dance ─────────────────────────────────────────────────────────
@@ -830,6 +852,29 @@ GENRE_RULES = [
         "estoy feliz",                 # house track
         "gta ",                        # house producer — trailing space
         "feder ",                      # house producer — trailing space
+        "666 ",                          # 666 — Eurodance/house act
+        "guetta",                        # David Guetta
+        "garrix",                        # Martin Garrix
+        "peniston",                      # CeCe Peniston — house vocalist
+        "nombe",                         # NoMBe — indie house
+        "prospa",                        # Prospa — UK house duo
+        "paul woolford",                 # Paul Woolford — house producer
+        "oden ",                         # Oden & Fatzo — house duo
+        "yves v",                        # Yves V — house DJ
+        "you man",                       # You Man — house producer
+        "reel2real",                     # Reel 2 Real — I Like To Move It
+        "ecuador",                       # Get A Room! — house track
+        "carnaval de paris",             # CID — house track
+        "head & heart",                  # Joel Corry — house track
+        "in and out of love",            # Armin van Buuren
+        "lucas ",                        # Lucas & Steve — house DJs
+        "coke & rum",                    # house track
+        "piano banana",                  # Krystal Klear — house
+        "chris lake",                    # Chris Lake — house producer
+        "beat freak",                    # Chris Lake — house track
+        "if it ain't love",              # house track
+        "we wanna party",                # TJR — house
+        "don't wanna go home",           # Jason Derulo — dance-pop
     ]),
 
     # ── Electronic / Psytrance / Techno ───────────────────────────────────────
@@ -1110,6 +1155,19 @@ GENRE_RULES = [
         "numa ",                       # electronic artist — trailing space
         "willem de roo",               # electronic artist
         "polish ambassador",           # electronic artist
+        "kalkbrenner",                   # Paul Kalkbrenner — techno
+        "alban",                         # Dr. Alban — eurodance
+        "nghtwrk",                       # NGHTWRK — electronic producer
+        "hoken",                         # HÖKEN — electronic
+        "kingdom ",                      # Kingdom — electronic producer
+        "autoload",                      # Autoload — electronic
+        "hermetico",                     # Hermetico — electronic
+        "touch and go",                  # Touch And Go — electronic
+        "snake city",                    # Snake City — electronic
+        "soda ",                         # Soda — electronic producer
+        "joost ",                        # Joost — electronic/pop
+        "bomel",                         # Bomel — electronic edit
+        "superheld",                     # Rob & Chris — electronic
     ]),
 
     # ── Rock & Alternative ────────────────────────────────────────────────────
@@ -1392,6 +1450,11 @@ GENRE_RULES = [
         "totally wired",               # The Fall — title keyword
         "inner wave",                  # indie rock band
         "slow emotion replay",         # The The — title keyword
+        "sugar ",                        # SUGAR — rock band
+        "if i die young",                # The Band Perry — country-rock
+        "toten ",                        # Die Toten — German punk-rock
+        "lewis del mar",                 # Lewis Del Mar — indie rock
+        "magic city hippies",            # Magic City Hippies — indie rock
     ]),
 
     # ── Pop & Commercial ──────────────────────────────────────────────────────
@@ -1699,6 +1762,20 @@ GENRE_RULES = [
         "supercut",                    # Lorde — title keyword
         "the louvre",                  # Lorde — title keyword
         "temperature",                 # Sean Paul — title keyword
+        "sheeran",                       # Ed Sheeran
+        "gambino",                       # Childish Gambino
+        "iglesias",                      # Enrique Iglesias
+        "derulo",                        # Jason Derulo
+        "monae",                         # Janelle Monáe
+        "magnifico",                     # Magnifico — Slovenian pop
+        "christoff",                     # Christoff — Belgian pop singer
+        "wendler",                       # Michael Wendler — German pop
+        "nadro",                         # Nadro — tropical pop
+        "malcolm mclaren",               # Malcolm McLaren — pop
+        "lion king",                     # Lion King — Disney pop
+        "we saw lions",                  # We Saw Lions — indie pop
+        "coca-cola anthem",              # FIFA 2018 anthem
+        "colors ",                       # Colors anthem — pop
     ]),
 
     # ── Classics & Oldies ─────────────────────────────────────────────────────
@@ -1989,6 +2066,10 @@ GENRE_RULES = [
         "delibes",                     # composer
         "london starlight",            # orchestral group
         "outlander",                   # soundtrack
+        "it's my party",                 # Lesley Gore — 1963 classic
+        "lesley gore",                   # Lesley Gore — classic pop
+        "buchanan brothers",             # Buchanan Brothers — classics
+        "happy birthday",                # classic song
     ]),
 
     # ── World & Ecstatic ──────────────────────────────────────────────────────
@@ -2152,6 +2233,13 @@ GENRE_RULES = [
         "yemanjo",                     # artist
         "guru singh",                  # spiritual musician
         "omkara",                      # artist
+        "feliciano",                     # José Feliciano — Latin/world crossover
+        "jain ",                         # Jain — world-pop (Makeba)
+        "mendes",                        # Sergio Mendes — Brazilian
+        "xavier rudd",                   # Xavier Rudd — Australian world/roots
+        "danit ",                        # Danit — world music
+        "xenia ",                        # Xenia — Portuguese/world
+        "palenque",                      # Palenque Records — Colombian world
     ]),
 
     # ── 11 Remixes (LAST rule — catches any remaining unclassified remixes) ──
@@ -2168,6 +2256,11 @@ GENRE_RULES = [
         "mixmstrstel",                 # remix label
         "maw mix",                     # remix variant
         "super bowl anthem",           # track keyword
+        "i.o.you",                       # I.O.YOU — remix artist
+        "winati",                        # WINATI — remix producer
+        "swick",                         # Swick — remix producer
+        "peer kusiv",                    # Peer Kusiv — remix/edit
+        "rauschhaus",                    # Rauschhaus — remix/edit
     ]),
 
 ]
