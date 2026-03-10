@@ -452,6 +452,20 @@ GENRE_RULES = [
         "cypher", "diss track", "mixtape",
         "grime", "uk drill", "afroswing",
         "afrobeats dj", "melodic rap",
+        # ─ Added v17: expanded hip-hop/R&B subgenres from genre databases ─
+        "dirty south", "crunk ", "hyphy ",
+        "conscious hip hop", "jazz rap", "lo-fi hip hop",
+        "instrumental hip hop", "turntablism",
+        "horrorcore", "nerdcore",
+        "new jack swing", "quiet storm",
+        "neo-soul", "neo soul", "motown",
+        "doo wop", "doo-wop", "doowop",
+        "funk ", "soul ", "northern soul",
+        "southern soul", "psychedelic soul",
+        "contemporary r&b",
+        "drill ", "chicago drill",
+        "phonk ", "memphis rap",
+        "cloud rap", "emo rap",
         # ─ Added v6 ─
         "cardi b",
         "mobb deep",              # Queens rap (Shook Ones, Hell on Earth)
@@ -611,6 +625,17 @@ GENRE_RULES = [
         "latin jazz", "latin house",
         "moombahton", "latin trap",
         "corrido", "banda ", "norteño",
+        # ─ Added v17: expanded Latin subgenres from genre databases ─
+        "bolero ", "mambo ", "son cubano", "timba ",
+        "ranchera", "tejano", "chicha",
+        "flamenco", "nuevo flamenco", "rumba ",
+        "tango ", "milonga ",
+        "pagode", "sertanejo", "tecnobrega", "brega ",
+        "funk carioca", "baile funk",
+        "lambada", "zouk ", "kizomba",
+        "punta ", "soca ", "calypso",
+        "latin rock", "rock en español", "rock latino",
+        "reggaeton y hip-hop", "trap latino",
         # ─ Added v6 ─
         "carlos gardel",          # Argentine tango legend
         "bomba estéreo", "bomba estereo",   # Colombian electrotropical
@@ -838,6 +863,17 @@ GENRE_RULES = [
         "uk garage", "future bass", "bass house",
         "dj set", "live set", "festival mix",
         "disco ", "funky ",
+        # ─ Added v17: expanded house/dance subgenres from genre databases ─
+        "acid house", "chicago house", "french house", "dutch house",
+        "latin house", "minimal house", "ghetto house", "vocal house",
+        "diva house", "italo house", "bounce house", "swing house",
+        "speed garage", "garage house",
+        "eurodance", "euro dance", "italo dance", "hi-nrg", "hi nrg",
+        "electroswing", "electro swing", "electro-swing",
+        "dance pop", "dance-pop",
+        "freestyle ", "freestyle house",
+        "boogie ", "post-disco", "post disco",
+        "hard dance", "bouncy techno",
         # ─ Added v6 ─
         "deee-lite", "deee lite",   # NYC dance/house (Groove Is in the Heart, 1990)
         "stardust ",                # French house duo (Music Sounds Better With You, 1998) — trailing space
@@ -1144,6 +1180,29 @@ GENRE_RULES = [
         "hardstyle", "hardcore", "gabber",
         "glitch hop", "glitch",
         "idm ", "experimental",
+        # ─ Added v17: expanded electronic subgenres from genre databases ─
+        "acid techno", "detroit techno", "minimal techno", "schranz",
+        "acid trance", "uplifting trance", "vocal trance", "hard trance",
+        "dark psy", "dark psytrance", "suomisaundi",
+        "drum n bass", "drum'n'bass", "drumstep", "darkstep",
+        "liquid funk", "jump-up", "jump up", "drumfunk",
+        "intelligent drum", "techstep",
+        "chillstep", "brostep", "riddim ",
+        "downtempo", "trip hop", "trip-hop", "triphop",
+        "chillout", "chill out", "chill-out", "balearic",
+        "vaporwave", "synthpop", "synth-pop", "synth pop",
+        "darkwave", "dark wave", "coldwave", "cold wave",
+        "industrial ", "ebm ", "aggrotech",
+        "future garage", "future house",
+        "8bit", "chiptune", "bitpop",
+        "breakcore", "speedcore", "terrorcore", "doomcore",
+        "uk hardcore", "happy hardcore", "makina ",
+        "jumpstyle", "hardstep",
+        "bass music", "uk bass", "bassline",
+        "folktronica", "indietronica",
+        "noise ", "japanoise", "power electronics",
+        "drone ", "dark ambient",
+        "lo-fi ", "lofi ",
         # ─ Added v7: electronic / DJ producers from INBOX analysis ─
         "perc ",                  # Perc (Ali Wells) — UK techno — trailing space
         "mura masa",              # UK electronic/pop producer (Love$ick, Lovesick)
@@ -1502,6 +1561,24 @@ GENRE_RULES = [
         "classic rock", "glam rock",
         "screamo", "post-hardcore", "metalcore",
         "emo ", "pop punk", "skate punk",
+        # ─ Added v17: expanded rock/metal subgenres from genre databases ─
+        "stoner rock", "stoner metal", "doom metal",
+        "thrash metal", "death metal", "black metal",
+        "power metal", "speed metal", "groove metal",
+        "symphonic metal", "gothic metal", "folk metal",
+        "viking metal", "pagan metal", "pirate metal",
+        "sludge ", "djent ", "math rock", "math metal",
+        "grindcore", "deathcore", "crossover thrash",
+        "psychedelic rock", "acid rock", "space rock",
+        "shoegaze", "dream pop", "noise rock",
+        "surf rock", "garage rock", "brit pop", "britpop",
+        "art rock", "art punk", "new wave",
+        "post-punk", "post punk", "goth rock", "gothic rock",
+        "rockabilly", "psychobilly",
+        "southern rock", "blues rock", "blues-rock",
+        "yacht rock", "soft rock", "arena rock",
+        "afro punk", "afropunk",
+        "indie ", "lo-fi rock",
         # ─ Added v6 ─
         "talking heads",          # new wave / art rock (Psycho Killer, Burning Down the House)
         "tom tom club",           # Talking Heads offshoot (Genius of Love)
@@ -1949,6 +2026,17 @@ GENRE_RULES = [
         "one and only",                  # Chesney Hawkes — pop classic
         "jason weaver",                  # Jason Weaver — Lion King pop
         "boy - railway",                 # Boy — indie pop
+        # ─ Added v17: expanded pop subgenres from genre databases ─
+        "bubblegum pop", "teen pop", "chamber pop",
+        "indie pop", "indie-pop", "jangle pop",
+        "electropop", "electro pop", "electro-pop",
+        "bedroom pop", "hyperpop", "hyper pop",
+        "k-pop", "kpop", "j-pop", "jpop", "c-pop", "cpop",
+        "europop", "euro pop", "schlager",
+        "power pop", "sunshine pop",
+        "new romantic", "new romanticism",
+        "adult contemporary", "easy listening",
+        "chanson", "french pop",
     ]),
 
     # ── Classics & Oldies ─────────────────────────────────────────────────────
@@ -2411,6 +2499,26 @@ GENRE_RULES = [
         "didgeridoo", "native american",
         "deep forest", "enigma ",
         "world beat",
+        # ─ Added v17: expanded world subgenres from genre databases ─
+        "afrobeat", "afro-beat", "afropop", "afro-pop",
+        "afro-house", "highlife", "soukous", "makossa",
+        "mbalax", "juju ", "fuji music", "kwaito",
+        "bongo flava", "gqom ", "amapiano",
+        "kuduro", "semba ", "coupe decale", "coupé-décalé",
+        "gnawa", "rai ", "raï ",
+        "bhangra", "bollywood", "filmi ",
+        "dangdut", "gamelan",
+        "celtic ", "klezmer", "balkan",
+        "polka ", "zydeco",
+        "roots reggae", "dub ", "dancehall",
+        "ska ", "rocksteady", "lovers rock",
+        "reggae ", "ragga ", "raggamuffin",
+        "calypso", "mento ",
+        "fado ", "rebetika", "laiko",
+        "throat singing", "overtone singing",
+        "ecstatic dance", "kirtan", "mantra",
+        "shamanic", "medicine music", "sound healing",
+        "tribal ", "ethno ", "ethnic ",
         # ─ Added v14: World/ecstatic artists from deep INBOX research ─
         "gcm",                         # artist
         "khululuma",                   # artist
