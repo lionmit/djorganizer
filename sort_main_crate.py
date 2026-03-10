@@ -90,6 +90,8 @@ def _load_or_ask_config():
         raw = input("  Source folder (your unsorted music): ").strip().strip("'\"")
         if not raw:
             continue
+        # Handle backslash-escaped spaces from Finder drag-and-drop
+        raw = raw.replace("\\ ", " ")
         mc = Path(raw)
         if mc.exists() and mc.is_dir():
             # Count audio files to give feedback
@@ -109,6 +111,8 @@ def _load_or_ask_config():
         raw = input("  Output folder (where genre folders go): ").strip().strip("'\"")
         if not raw:
             continue
+        # Handle backslash-escaped spaces from Finder drag-and-drop
+        raw = raw.replace("\\ ", " ")
         dr = Path(raw)
         if not dr.exists():
             create = input(f"    '{dr}' doesn't exist. Create it? [Y/n]: ").strip().lower()
