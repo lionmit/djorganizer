@@ -8,14 +8,15 @@ echo     https://github.com/lionmit/djorganizer
 echo   ======================================================
 echo.
 
-:: Check for Python
+:: Find Python
+set PYTHON=
 where python >nul 2>nul
 if %errorlevel% equ 0 (
-    python sort_main_crate.py
+    set PYTHON=python
 ) else (
     where python3 >nul 2>nul
     if %errorlevel% equ 0 (
-        python3 sort_main_crate.py
+        set PYTHON=python3
     ) else (
         echo   Python 3 is required but not installed.
         echo.
@@ -25,8 +26,29 @@ if %errorlevel% equ 0 (
         echo     3. IMPORTANT: Check "Add Python to PATH" during install
         echo     4. Double-click this file again
         echo.
+        goto :done
     )
 )
+
+:: Auto-install mutagen for better track classification (one time only)
+%PYTHON% -c "import mutagen" >nul 2>nul
+if %errorlevel% neq 0 (
+    echo   Setting up for first use... (one time only)
+    echo.
+    %PYTHON% -m pip install --user mutagen --quiet >nul 2>nul
+    %PYTHON% -c "import mutagen" >nul 2>nul
+    if %errorlevel% equ 0 (
+        echo   Metadata reading enabled — more tracks will be classified
+    ) else (
+        echo   (Metadata reading unavailable — tool works fine without it)
+    )
+    echo.
+)
+
+:: Run the sorter
+%PYTHON% sort_main_crate.py
+
+:done
 
 echo.
 echo   ------------------------------------------------------

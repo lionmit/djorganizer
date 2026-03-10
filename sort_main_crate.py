@@ -47,6 +47,14 @@ import csv
 from pathlib import Path
 from collections import defaultdict
 
+# Optional dependency — reads embedded metadata (genre/artist) from audio files.
+# Install: pip3 install mutagen   (or let DJOrganizer.command auto-install it)
+try:
+    from mutagen import File as MutagenFile
+    MUTAGEN_AVAILABLE = True
+except ImportError:
+    MUTAGEN_AVAILABLE = False
+
 # ─────────────────────────────────────────────────────────────────────────────
 # CONFIGURATION — set interactively on first run, saved to config file
 # ─────────────────────────────────────────────────────────────────────────────
@@ -2667,6 +2675,106 @@ def has_hebrew(text):
             return True
     return False
 
+# ─────────────────────────────────────────────────────────────────────────────
+# METADATA TAG READING (optional — requires mutagen)
+# Maps embedded genre/artist tags to our folder system as a fallback
+# when filename keywords don't match.
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Genre tag → folder key mapping (substring match, case-insensitive)
+GENRE_TAG_MAP = [
+    # Trance & Psy (check before electronic)
+    ("trance",    ["psytrance", "psy-trance", "psy trance", "goa trance",
+                   "goa", "trance", "uplifting", "vocal trance"]),
+    # Bass & DnB (check before electronic)
+    ("bass",      ["drum and bass", "drum & bass", "drum'n'bass", "dnb",
+                   "d&b", "dubstep", "riddim", "bass music", "jungle"]),
+    # Techno (check before electronic)
+    ("techno",    ["techno", "hardstyle", "hardcore", "gabber",
+                   "industrial", "schranz"]),
+    # Afrobeats & Amapiano (before house — "dancehall" must not match "dance")
+    ("afrobeats", ["afrobeats", "afrobeat", "amapiano", "dancehall",
+                   "soca", "gqom", "highlife", "kwaito", "kuduro"]),
+    # House
+    ("house",     ["house", "deep house", "tech house", "progressive house",
+                   "disco", "dance", "garage", "uk garage", "eurodance",
+                   "electro house", "nu disco", "nu-disco"]),
+    # Hip-Hop & R&B
+    ("hiphop",    ["hip-hop", "hip hop", "hiphop", "rap", "r&b", "rnb",
+                   "trap", "grime", "drill", "soul", "funk", "neo-soul"]),
+    # Latin
+    ("latin",     ["reggaeton", "latin", "salsa", "bachata", "cumbia",
+                   "merengue", "samba", "bossa nova", "tango", "flamenco",
+                   "urbano"]),
+    # Electronic (broad)
+    ("electronic",["electronic", "electronica", "electro", "ambient",
+                   "downtempo", "chillout", "trip-hop", "trip hop",
+                   "idm", "synth", "synthwave", "experimental",
+                   "edm", "glitch"]),
+    # Rock
+    ("rock",      ["rock", "alternative", "punk", "metal", "indie",
+                   "grunge", "shoegaze", "post-punk", "emo",
+                   "hard rock", "classic rock"]),
+    # Pop
+    ("pop",       ["pop", "dance pop", "synth pop", "indie pop",
+                   "britpop", "k-pop", "j-pop"]),
+    # Israeli (rare in tags but possible)
+    ("israeli",   ["israeli", "mizrahi", "hebrew"]),
+    # Classics
+    ("classics",  ["oldies", "golden", "classic", "retro",
+                   "60s", "70s", "80s"]),
+    # World
+    ("world",     ["world", "reggae", "ska", "african", "arabic",
+                   "indian", "celtic", "klezmer", "folk",
+                   "new age", "meditation"]),
+]
+
+def _read_metadata(filepath):
+    """Read genre and artist from audio file metadata. Returns (genre_str, artist_str) or (None, None)."""
+    if not MUTAGEN_AVAILABLE:
+        return (None, None)
+    try:
+        audio = MutagenFile(filepath, easy=True)
+        if audio is None:
+            return (None, None)
+        genre = None
+        artist = None
+        # Easy mode gives simple key access for most formats
+        if hasattr(audio, 'get'):
+            genre_list = audio.get('genre', [])
+            artist_list = audio.get('artist', [])
+            if genre_list:
+                genre = genre_list[0]
+            if artist_list:
+                artist = artist_list[0]
+        return (genre, artist)
+    except Exception:
+        return (None, None)
+
+def _classify_by_genre_tag(genre_str):
+    """Map a genre tag string to a folder key. Returns (genre_key, reason) or None."""
+    if not genre_str:
+        return None
+    tag_lower = genre_str.lower()
+    for folder_key, terms in GENRE_TAG_MAP:
+        for term in terms:
+            if term in tag_lower:
+                return (folder_key, f"Metadata genre tag: '{genre_str}' → '{term}'")
+    return None
+
+def _classify_by_artist_tag(artist_str):
+    """Run artist tag through the keyword engine. Returns (genre_key, reason) or None."""
+    if not artist_str:
+        return None
+    artist_lower = unicodedata.normalize('NFC', artist_str).lower()
+    for genre_key, keywords in GENRE_RULES:
+        if keywords is None:
+            continue
+        for kw in keywords:
+            if kw.lower() in artist_lower:
+                return (genre_key, f"Metadata artist tag: '{artist_str}' matched '{kw}'")
+    return None
+
 def classify_file(filepath):
     """Return (genre_key, matched_rule) for a given file path."""
     name = filepath.name
@@ -2681,7 +2789,7 @@ def classify_file(filepath):
     if has_hebrew(name):
         return ("israeli", "Hebrew characters detected in filename")
 
-    # 2. Keyword rules
+    # 2. Keyword rules (filename-based)
     for genre_key, keywords in GENRE_RULES:
         if keywords is None:
             continue   # handled by has_hebrew above
@@ -2689,11 +2797,23 @@ def classify_file(filepath):
             if kw.lower() in name_lower:
                 return (genre_key, f"Keyword match: '{kw}'")
 
-    # 3. Old-year fallback → Classics
+    # 3. Metadata fallback (reads embedded tags — only for unmatched files)
+    if MUTAGEN_AVAILABLE and filepath.exists():
+        genre_str, artist_str = _read_metadata(filepath)
+        # Try genre tag first
+        result = _classify_by_genre_tag(genre_str)
+        if result:
+            return result
+        # Try artist tag through keyword engine
+        result = _classify_by_artist_tag(artist_str)
+        if result:
+            return result
+
+    # 4. Old-year fallback → Classics
     if _has_old_year(name_lower):
         return ("classics", "Year 1900–1989 detected in filename")
 
-    # 4. Default: unclassified
+    # 5. Default: unclassified
     return ("inbox", "No match — needs manual review")
 
 def get_dest_folder(genre_key):
@@ -2886,6 +3006,12 @@ def main():
     print("  DJOrganizer — Auto-Sort Your Music Library by Genre")
     print("  https://github.com/lionmit/djorganizer")
     print("=" * 60)
+
+    if MUTAGEN_AVAILABLE:
+        print("  Metadata reading: ON (mutagen installed)")
+    else:
+        print("  Metadata reading: OFF")
+        print("  Tip: pip3 install mutagen — for better classification of unnamed tracks")
 
     # Interactive config
     MAIN_CRATE, DJ_MUSIC_ROOT = _load_or_ask_config()

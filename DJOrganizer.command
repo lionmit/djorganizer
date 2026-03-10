@@ -48,6 +48,19 @@ else
     exit 1
 fi
 
+# Auto-install mutagen for better track classification (one time only)
+if ! $PYTHON -c "import mutagen" 2>/dev/null; then
+    echo "  Setting up for first use... (one time only)"
+    echo ""
+    $PYTHON -m pip install --user mutagen --quiet 2>/dev/null
+    if $PYTHON -c "import mutagen" 2>/dev/null; then
+        echo "  ✓ Metadata reading enabled — more tracks will be classified"
+    else
+        echo "  (Metadata reading unavailable — tool works fine without it)"
+    fi
+    echo ""
+fi
+
 # Run the sorter in interactive mode
 $PYTHON sort_main_crate.py
 
