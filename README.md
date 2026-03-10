@@ -17,7 +17,7 @@ DJOrganizer reads your track filenames, matches them against a curated keyword e
 ## Quick Start (Mac)
 
 1. **Download** — Click the green "Code" button above → "Download ZIP". Unzip it.
-2. **Double-click** `DJOrganizer.command`
+2. **Double-click** `DJOrganizer.command` — if macOS blocks it, right-click → Open → Open.
 3. **Tell it where your music is** — drag your music folder into the terminal window
 4. **Preview** — see where every track will go (nothing moves yet)
 5. **Confirm** — type `y` to sort for real

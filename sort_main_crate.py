@@ -2711,6 +2711,14 @@ def main():
             else:
                 print("No saved settings to clear.")
             sys.exit(0)
+        elif sys.argv[1] in ("--help", "-h"):
+            print(__doc__)
+            print("COMMANDS:")
+            print("  python3 sort_main_crate.py           Interactive mode (recommended)")
+            print("  python3 sort_main_crate.py --preview  Preview only")
+            print("  python3 sort_main_crate.py --execute  Sort files for real")
+            print("  python3 sort_main_crate.py --reset    Clear saved folder settings")
+            sys.exit(0)
 
     # Banner
     print()
