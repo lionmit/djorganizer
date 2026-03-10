@@ -2,7 +2,7 @@
 
 Auto-sort your DJ music library into genre folders. No code, no API keys, no internet — just double-click and go.
 
-**1,000+ artist and genre keywords** refined across 16 versions. Tested on a 6,000+ track library with 95.6% classification accuracy.
+**1,500+ artist and genre keywords** refined across 17 versions. Tested on a 3,700+ track library with 95.6% classification accuracy.
 
 ---
 
@@ -48,17 +48,21 @@ To reconfigure anytime: `python3 sort_main_crate.py --reset`
 
 | Folder | What Goes Here |
 |--------|---------------|
-| `01 Israeli & Hebrew` | Mizrahi, Israeli pop, Hebrew-language music |
-| `02 Hip-Hop & R&B` | Hip-hop, rap, R&B, grime, drill |
-| `03 House & Dance` | House, deep house, disco, dance |
-| `04 Electronic` | Techno, trance, drum & bass, ambient |
-| `05 Pop & Commercial` | Pop, indie-pop, commercial hits |
-| `06 Rock & Alternative` | Rock, punk, indie, metal, shoegaze |
-| `07 Latin` | Reggaeton, salsa, bachata, Brazilian, cumbia |
-| `08 Classics & Oldies` | Pre-1990 / golden era music |
-| `09 World & Ecstatic` | World music, African, reggae, Afrobeats |
-| `10 Tools & FX` | Stems, acapellas, samples, DJ tools |
-| `11 Remixes` | Unclassified remixes |
+| `01 Hip-Hop & R&B` | Hip-hop, rap, R&B, grime, drill |
+| `02 House` | House, deep house, disco, dance, tech house |
+| `03 Techno` | Techno, hardstyle, hardcore, industrial |
+| `04 Trance & Psy` | Psytrance, goa, uplifting trance, vocal trance |
+| `05 Bass & DnB` | Drum & bass, dubstep, bass music, riddim |
+| `06 Electronic` | Ambient, downtempo, synth, IDM, trip-hop |
+| `07 Pop & Commercial` | Pop, indie-pop, commercial hits |
+| `08 Rock & Alternative` | Rock, punk, indie, metal, shoegaze |
+| `09 Latin` | Reggaeton, salsa, bachata, Brazilian, cumbia |
+| `10 Afrobeats & Amapiano` | Afrobeats, amapiano, dancehall, soca, gqom |
+| `11 World & Ecstatic` | World music, reggae, Arabic, Indian, ecstatic |
+| `12 Classics & Oldies` | Pre-1990 / golden era music |
+| `13 Israeli & Hebrew` | Mizrahi, Israeli pop, Hebrew-language music |
+| `14 Tools & FX` | Stems, acapellas, samples, DJ tools |
+| `15 Remixes` | Unclassified remixes |
 | `00_INBOX` | Unclassified — needs your manual review |
 
 ---
@@ -87,7 +91,7 @@ The keyword engine is community-powered. If a track gets misclassified:
 
 DJOrganizer was built without writing a single line of code manually. The entire tool — from first prototype to the version you're using now — was created through conversation with [Claude Code](https://claude.ai/claude-code).
 
-It started at Midburn (the Israeli Burning Man) with two phones and an analog mixer. 6,000+ tracks and 16 versions later, the library sorts itself in seconds.
+It started at Midburn (the Israeli Burning Man) with two phones and an analog mixer. 3,700+ tracks and 17 versions later, the library sorts itself in seconds.
 
 Read the full build log: [creative-gym-67.vercel.app/log.html](https://creative-gym-67.vercel.app/log.html)
 

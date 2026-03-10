@@ -4,8 +4,8 @@ DJOrganizer — Auto-Sort Your DJ Music Library by Genre
 =======================================================
 Classifies every audio file in your music folder into genre sub-folders
 using filename keyword analysis. No audio analysis, no API keys, no
-internet connection — just smart keyword matching refined across 16
-versions with 1,000+ artist and genre keywords.
+internet connection — just smart keyword matching refined across 17
+versions with 1,500+ artist and genre keywords.
 
 Created by Lionel Mitelpunkt with Claude Code.
 Open source — CC-BY 4.0 — https://github.com/lionmit/djorganizer
@@ -28,12 +28,14 @@ SAFETY:
   - After executing: Rekordbox → File → Relocate → Auto Relocate
 
 GENRE FOLDERS CREATED:
-  01 Israeli & Hebrew    07 Latin
-  02 Hip-Hop & R&B       08 Classics & Oldies
-  03 House & Dance       09 World & Ecstatic
-  04 Electronic          10 Tools & FX
-  05 Pop & Commercial    11 Remixes
-  06 Rock & Alternative  00_INBOX (unclassified)
+  01 Hip-Hop & R&B       09 Latin
+  02 House               10 Afrobeats & Amapiano
+  03 Techno              11 World & Ecstatic
+  04 Trance & Psy        12 Classics & Oldies
+  05 Bass & DnB          13 Israeli & Hebrew
+  06 Electronic          14 Tools & FX
+  07 Pop & Commercial    15 Remixes
+  08 Rock & Alternative  00_INBOX (unclassified)
 """
 
 import os
@@ -142,17 +144,21 @@ DJ_MUSIC_ROOT = None
 
 # Folder names inside DJ_MUSIC_ROOT
 FOLDERS = {
-    "israeli":     "01 Israeli & Hebrew",
-    "hiphop":      "02 Hip-Hop & R&B",
-    "house":       "03 House & Dance",
-    "electronic":  "04 Electronic",
-    "pop":         "05 Pop & Commercial",
-    "rock":        "06 Rock & Alternative",
-    "latin":       "07 Latin",
-    "classics":    "08 Classics & Oldies",
-    "world":       "09 World & Ecstatic",
-    "tools":       "10 Tools & FX",
-    "remixes":     "11 Remixes",
+    "hiphop":      "01 Hip-Hop & R&B",
+    "house":       "02 House",
+    "techno":      "03 Techno",
+    "trance":      "04 Trance & Psy",
+    "bass":        "05 Bass & DnB",
+    "electronic":  "06 Electronic",
+    "pop":         "07 Pop & Commercial",
+    "rock":        "08 Rock & Alternative",
+    "latin":       "09 Latin",
+    "afrobeats":   "10 Afrobeats & Amapiano",
+    "world":       "11 World & Ecstatic",
+    "classics":    "12 Classics & Oldies",
+    "israeli":     "13 Israeli & Hebrew",
+    "tools":       "14 Tools & FX",
+    "remixes":     "15 Remixes",
     "inbox":       "00_INBOX",
 }
 
@@ -202,95 +208,157 @@ GENRE_RULES = [
 
     # ── Israeli & Hebrew ──────────────────────────────────────────────────────
     # Hebrew Unicode (U+0590–U+05FF) detected separately in has_hebrew()
-    ("israeli_unicode", None),
 
-    ("israeli", [
-        # ─ Verified Israeli artists (from tracklist analysis) ─
-        "quarter to africa",
-        "made in tlv",
-        "darwish",                    # David Abramov, Haifa trance DJ
-        "yoel lewis",
-        "riff cohen",
-        "noga erez",
-        "red axes",
-        # ─ Mizrahi / mainstream Israeli pop ─
-        "eyal golan", "eden ben zaken", "eden ben-zaken",
-        "moshe peretz", "kobi peretz", "sarit hadad", "dudu aharon",
-        "boaz sharabi", "omer adam", "noa kirel", "bar gofer",
-        "lior nini", "avraham tal", "shai gabso", "shiri maimon",
-        "keren peles", "harel skaat", "marina maximilian", "ninet tayeb",
-        "ziv navon", "ido netanyahu", "ziv yehezkel",
-        "idan amedi", "ishay ribo", "omer klein",
-        "margalit tzanani", "avi biter", "yigal bashan",
-        "zehava ben", "zohar argov", "moshe giat", "arik shadmi",
-        "lea shabat", "shoshana damari", "yaffa yarkoni",
-        "shlomo artzi", "shalom chanoch", "yehoram gaon", "gali atari",
-        "zvika pick", "ofra haza", "arik einstein",
-        "izhar cohen", "nurit galron", "gidi gov", "uzi hitman",
-        "rami kleinstein", "ilana avital", "orna portath", "yoni rechter",
-        "chava alberstein", "naomi shemer",
-        "david broza", "shlomi shabat", "shlomi shaban",
-        "yehuda poliker", "rita ",
-        "ivri lider", "eran tzur",
-        "miri aloni", "mosh ben ari", "mosh & tuk",
-        "corinne allal", "achinoam nini",
-        "ehud banai", "yossi banai", "meir banai", "yuval banai",
-        "yaakov shwekey", "mordechai ben david",
-        "danny sanderson", "karolina",
-        "nikki levy",
-        # ─ Israeli rock / indie ─
-        "hadag nahash", "hadag",
-        "knesiyat hasekhel", "knesiyat",
-        "rockfour", "tislam", "minimal compact",
-        "asaf avidan", "aviv gefen",
-        "static ben el", "static & ben", "static and ben",
-        # ─ Israeli hip-hop ─
-        "subliminal", "hip hop gal", "hatikva 6", "hatikva6",
-        "mook-e", "sagol 59",
-        # ─ Israeli electronic / psytrance (also in electronic) ─
+    # ── Trance & Psy ───────────────────────────────────────────────────────────
+    ("trance", [
+        # ─ Israeli psytrance ─
         "infected mushroom", "astral projection",
+        "gms ", "perfect stranger", "sun project", "loud ",
         "vini vici", "captain hook", "ace ventura",
-        "skazi", "gms ", "borgore",
-        # ─ Genre / language terms ─
-        "mizrahi", "mizrachit", "mizrakhi", "mizrachi",
-        "yemenite", "sephardi", "sfaradi",
-        "israeli", "israelit", "hebrew",
-        "pizmon", "shira", "nigun",
-        # ─ Common transliterated Hebrew words that appear in titles ─
-        "ahava", "ahavah", "ahavat",
-        "hayam", "habayit", "haboker", "hatikva",
-        "neshama", "neshamot",
-        "yerushalayim", "jerusalem", "eretz",
-        "shabbat", "shabbos", "chag sameach",
-        "mazal tov", "mazel tov",
-        "sababa", "achi", "yalla",
-        "am yisrael", "yisrael",
-        "sashka ",
-        # ─ Added v6 ─
-        "dana international",
-        "eviatar banai",
-        "avihu pinhasov",
-        "nadav guedj",
-        "ravid ",                # Ravid Plotnik / Ravid Kahalani / Ravid Alma
-        "laor ",                 # Laor (singer)
-        "zohar bar shalom",
-        # ─ Added v11: Israeli artists from INBOX analysis ─
-        "arutz hakibud",          # Israeli phrase / artist reference
-        # ─ Added v12: Israeli artists from INBOX analysis ─
-        "hamefakedet",            # HaMefakedet — Israeli TV show theme / viral music
-        "ninet ",                 # Ninet Tayeb — Israeli singer (Tfilati, Bo) — trailing space
-        "ben el tavori",          # Ben El Tavori — Israeli Mizrahi pop (Shir Meyuchad)
-        "zafrir ifrach",          # Zafrir Ifrach — Israeli musician
-        # ─ Added v13: Israeli artists from INBOX analysis ─
-        "basimlah",               # BaSimlah Aduma — Israeli band
-        "dr casper",              # Dr. Casper — Israeli hip-hop/electronic artist
-        # ─ Added v14: Israeli artists from deep INBOX research ─
-        "kafkaf",                 # Israeli artist
-        "- netta",                # Eurovision 2018 "Toy" — uses dash-prefix to avoid "estoy" false positive
-        "mifgash",                # Israeli artist/group
-        "dale promo",                    # Noa Kirel — Israeli artist
-        "toy - israel",                  # TOY — Eurovision 2018 Israeli entry
-        "buttering trio",                # Buttering Trio — Israeli jazz-funk
+        "skazi", "talamasca", "x-dream",
+        "astrix", "juno reactor", "hallucinogen",
+        "simon posford", "shpongle",
+        "avalon ", "oforia", "ubar tmar",
+        "1200 mics", "riktam",
+        "sol tribe", "alien project",
+        "psysex",
+        "1200 micrograms", "1200mcg",
+        "outsiders & dickster",
+        "tristan & bliss",
+        "dubtazer",               # psy-dub
+        "darwish",                # David Abramov, Haifa trance DJ
+        # ─ Global psytrance / goa ─
+        "parasense", "vibrasphere",
+        "cosmosis", "transwave",
+        "total eclipse", "psyphenomenon",
+        # ─ Trance artists ─
+        "armin van buuren", "van buuren",
+        "paul van dyk",
+        "sasha ", "john digweed",
+        "markus schulz", "paul oakenfold",
+        "ferry corsten", "tiesto", "tiësto",
+        "above & beyond", "above and beyond",
+        "giuseppe ottaviani", "solarstone",
+        "factor b", "bryan kearney",
+        "aly & fila", "aly and fila",
+        "gareth emery", "andrew rayel",
+        "dash berlin", "cosmic gate",
+        "judge jules", "mike shiver",
+        "simon & biggs", "chicane",
+        "rank 1", "rank1", "push ", "svenson",
+        "binary finary",
+        "omnia ",
+        "ilan bluestone",
+        "denis kenzo",
+        "kryder",
+        "arty ",
+        "genix",
+        "super8 & tab", "super8 and tab",
+        "rodg ",
+        "estiva",
+        "david gravell",
+        "simon lee & alvin", "simon lee and alvin",
+        "alexander popov",
+        "drym",
+        "luke bond",
+        "orjan nilsen", "ørjan nilsen",
+        "ana criado",
+        "andrew bayer",
+        "ashley wallbridge",
+        "christina novelli",
+        "alexandra badoi",
+        "frainbreeze",
+        "guru josh",
+        "tom wax",
+        "willem de roo",
+        # ─ Genre terms ─
+        "psytrance", "psy trance", "psy-trance",
+        "goa trance", "goa ",
+        "progressive psy", "full on", "fullon",
+        "trance ",
+        "acid trance", "uplifting trance", "vocal trance", "hard trance",
+        "dark psy", "dark psytrance", "suomisaundi",
+    ]),
+
+    # ── Bass & DnB ───────────────────────────────────────────────────────────
+    ("bass", [
+        # ─ Drum & Bass ─
+        "goldie", "ltj bukem",
+        "roni size", "bad boy bill",
+        "sub focus", "chase & status", "chase and status",
+        "andy c", "high contrast",
+        "pendulum", "total science", "calibre",
+        "danny byrd", "shy fx",
+        "congo natty", "dj marky",
+        "logistics", "london elektricity",
+        "hospital records",
+        "wilkinson ",
+        "mako ",
+        "taiki nulight",
+        "serial killaz",
+        "frederic robinson",
+        "clipz",
+        "matrix & futurebound",
+        # ─ Dubstep ─
+        "benga ", "digital mystikz",
+        "mala ", "coki ",
+        "rusko", "caspa",
+        "cookie monsta", "doctor p",
+        "flux pavilion", "12th planet",
+        "excision", "datsik",
+        "skrillex", "borgore",
+        "zomboy ",
+        "subb theory",
+        # ─ Bass / trap producers ─
+        "nghtmre",
+        "slander ",
+        "troyboi ",
+        "bassnectar",
+        "rezz ",
+        "hucci",
+        "cirqular",
+        "neuroplasm",
+        "deekapz",
+        "ahadadream",
+        # ─ Genre terms ─
+        "dubstep", "drum and bass", "drum & bass", "dnb",
+        "drum n bass", "drum'n'bass", "drumstep", "darkstep",
+        "liquid funk", "jump-up", "jump up", "drumfunk",
+        "intelligent drum", "techstep",
+        "neurofunk", "liquid dnb",
+        "chillstep", "brostep", "riddim ",
+        "bass music", "uk bass", "bassline",
+        "breakcore", "speedcore", "terrorcore", "doomcore",
+    ]),
+
+    # ── Techno ───────────────────────────────────────────────────────────────
+    ("techno", [
+        # ─ Techno artists ─
+        "carl cox", "ben klock",
+        "marcel dettmann", "adam beyer",
+        "blawan", "surgeon",
+        "speedy j", "len faki",
+        "plastikman", "richie hawtin",
+        "sven vath", "sven väth",
+        "chris liebing", "sam paganini",
+        "joseph capriati", "nina kraviz",
+        "dax j", "mndsgn",
+        "charlotte de witte",
+        "paul kalkbrenner", "kalkbrenner",
+        "amelie lens",
+        "perc ",
+        "pleasurekraft",
+        "jan blomqvist",
+        "carlita",
+        "dan caster",
+        # ─ Genre terms ─
+        "techno ",
+        "acid techno", "detroit techno", "minimal techno", "schranz",
+        "melodic techno",
+        "hardstyle", "hardcore", "gabber",
+        "uk hardcore", "happy hardcore", "makina ",
+        "jumpstyle", "hardstep",
+        "hard dance", "bouncy techno",
     ]),
 
     # ── Hip-Hop & R&B ─────────────────────────────────────────────────────────
@@ -1025,11 +1093,65 @@ GENRE_RULES = [
         "yowsah",                        # CHIC — Dance Dance Dance
     ]),
 
-    # ── Electronic / Psytrance / Techno ───────────────────────────────────────
+    # ── Afrobeats & Amapiano ────────────────────────────────────────────────────
+    ("afrobeats", [
+        # ─ Afrobeats / Afropop artists ─
+        "wizkid",
+        "burna boy",
+        "davido",
+        "tiwa savage",
+        "yemi alade",
+        "tems ",
+        "ckay ",
+        "fireboy dml",
+        "rema ",
+        "omah lay",
+        "asake",
+        "ayra starr",
+        "joeboy",
+        "patoranking",
+        "tekno ",
+        "mr eazi",
+        "aya nakamura",
+        "fela kuti", "fela ",
+        "lijadu sisters",
+        "magic system",
+        # ─ Amapiano artists ─
+        "kabza de small",
+        "dj maphorisa",
+        "focalistic",
+        "uncle waffles",
+        "costa titch",
+        "major league djz",
+        "scorpion kings",
+        "musa keys",
+        "vigro deep",
+        # ─ Dancehall / Soca ─
+        "shabba ranks", "buju banton",
+        "beenie man", "sean paul",
+        "shaggy", "vybz kartel",
+        "popcaan", "alkaline",
+        "spice ",
+        "machel montano",
+        "bunji garlin",
+        "bombo clat",
+        # ─ Genre terms ─
+        "afrobeats", "afropop", "afro-pop",
+        "afrobeat", "afro-beat",
+        "amapiano", "gqom", "gqom ",
+        "kwaito", "bongo flava",
+        "highlife", "soukous", "makossa",
+        "kuduro", "semba ",
+        "coupe decale", "coupé-décalé",
+        "dancehall",
+        "soca ", "calypso",
+    ]),
+
+    # ── Electronic (broad) ───────────────────────────────────────────────────
     ("electronic", [
-        # ─ Added from tracklist analysis ─
-        "arthur russell",     # NYC avant-garde electronic / disco
-        "moby ",              # space after 'moby' to avoid false positives
+        # ─ Major electronic artists ─
+        "arthur russell",
+        "moby ",
         "sylvan esso",
         "big wild",
         "stromae",
@@ -1042,105 +1164,9 @@ GENRE_RULES = [
         "polo & pan", "polo and pan",
         "kraftwerk",
         "new order",
-        "joy division",       # post-punk/electronic crossover
-        # ─ Israeli psytrance ─
-        "infected mushroom", "astral projection",
-        "gms ", "perfect stranger", "sun project", "loud ",
-        "vini vici", "captain hook", "ace ventura",
-        "skazi", "talamasca", "x-dream",
-        "astrix", "juno reactor", "hallucinogen",
-        "simon posford", "shpongle",
-        "avalon ", "oforia", "ubar tmar",
-        "1200 mics", "riktam",
-        "sol tribe", "alien project",
-        "psysex",
-        # ─ Global psytrance / goa ─
-        "parasense", "vibrasphere",
-        "cosmosis", "transwave",
-        "total eclipse", "psyphenomenon",
-        # ─ Trance ─
-        "armin van buuren", "paul van dyk",
-        "sasha ", "john digweed",
-        "markus schulz", "paul oakenfold",
-        "ferry corsten", "tiesto",
-        "above & beyond",
-        "giuseppe ottaviani", "solarstone",
-        "factor b", "bryan kearney",
-        "aly & fila", "aly and fila",
-        "gareth emery", "andrew rayel",
-        "dash berlin", "cosmic gate",
-        "judge jules", "mike shiver",
-        "simon & biggs", "chicane",
-        "atb ", "darude",
-        "ian van dahl", "alice dj",
-        "rank 1", "push ", "svenson",
-        "binary finary",
-        # ─ Added v4: trance artists from numbered 1.xx tracks ─
-        "omnia ",             # trailing space — avoids 'omnia records'
-        "ilan bluestone",
-        "denis kenzo",
-        "kryder",
-        "arty ",              # DJ/producer Arty — trailing space
-        "genix",
-        "super8 & tab", "super8 and tab",
-        "rodg ",              # trailing space
-        "estiva",
-        "david gravell",
-        "simon lee & alvin", "simon lee and alvin",
-        "alexander popov",
-        "drym",
-        "luke bond",
-        "orjan nilsen", "ørjan nilsen",
-        "ana criado",
-        "andrew bayer",
-        "ashley wallbridge",
-        # ─ Added v5: trance artists from INBOX analysis ─
-        "christina novelli",      # vocal trance (1.05 track)
-        "alexandra badoi",        # trance vocalist (Feel & Alexandra Badoi)
-        "frainbreeze",            # progressive/trance producer
-        # ─ Added v5: electronic artists from INBOX analysis ─
-        "gesaffelstein",          # dark electro/industrial
-        "tycho ",                 # trailing space — ambient electronic
-        "celldweller",            # electronic rock/industrial
-        "mr oizo", "mr. oizo",    # French electro / Filter
-        "nghtmre",                # bass/EDM
-        "slander ",               # EDM duo
-        "1200 micrograms", "1200mcg",  # Goa/psytrance
-        "infected mushroom",      # already likely present — safety add
-        "skrillex",               # dubstep/EDM
-        "rezz ",                  # dark electronic
-        "hermitude",              # electronic hip-hop / trip-hop
-        # ─ Techno ─
-        "carl cox", "ben klock",
-        "marcel dettmann", "adam beyer",
-        "blawan", "surgeon",
-        "speedy j", "len faki",
-        "plastikman", "richie hawtin",
-        "sven vath", "sven väth",
-        "chris liebing", "sam paganini",
-        "joseph capriati", "nina kraviz",
-        "dax j", "mndsgn",
-        "dj stingray",
-        # ─ Drum & Bass ─
-        "goldie", "ltj bukem",
-        "roni size", "bad boy bill",
-        "sub focus", "chase & status", "chase and status",
-        "andy c", "high contrast",
-        "pendulum", "total science", "calibre",
-        "danny byrd", "shy fx",
-        "congo natty", "dj marky",
-        "logistics", "london elektricity",
-        "hospital records",
-        # ─ Dubstep ─
-        "benga ", "digital mystikz",
-        "mala ", "coki ",
-        "rusko", "caspa",
-        "cookie monsta", "doctor p",
-        "flux pavilion", "12th planet",
-        "excision", "datsik",
-        "skrillex", "borgore",
+        "joy division",
         # ─ International electronic ─
-        "daft punk", "aphex twin", "chemical brothers",
+        "daft punk", "aphex twin", "chemical brothers", "chemical_brothers",
         "prodigy", "the prodigy", "underworld",
         "massive attack", "portishead", "tricky ",
         "deadmau5", "diplo ",
@@ -1156,42 +1182,169 @@ GENRE_RULES = [
         "porter robinson", "what so not",
         "kaytranada", "shlohmo",
         "nicolas jaar", "machinedrum",
-        "gramatik", "bassnectar",
+        "gramatik",
         "pretty lights", "sts9",
-        # ─ Added v4: electronic / DJ artists ─
-        "theo parrish",       # Detroit deep house / electronic
-        "pachanga boys",      # German minimal house (Kompakt)
-        "blundetto",          # French beats / world bass
-        "joey pecoraro",      # lo-fi beats / electronic
-        "moreno pezzolato",   # Italian nu-disco / electronic
-        "carbon decay",       # cyberpunk/dubstep/techno producer
-        "c2c ",               # French turntablist group — trailing space (avoids 'c2c records' false pos)
-        "camelphat",          # UK house/electronic duo
-        "the allergies",      # UK hip-hop/breaks duo
-        "krono ",             # French electronic producer — trailing space
+        "lcd soundsystem",
+        # ─ Electronic producers ─
+        "gesaffelstein",
+        "tycho ",
+        "celldweller",
+        "mr oizo", "mr. oizo",
+        "hermitude",
+        "pachanga boys",
+        "blundetto",
+        "joey pecoraro",
+        "moreno pezzolato",
+        "carbon decay",
+        "c2c ",
+        "camelphat",
+        "the allergies",
+        "krono ",
+        "theo parrish",
+        "mura masa",
+        "noizu ",
+        "tim berg",
+        "whethan",
+        "klingande",
+        "tungevaag",
+        "mousse t",
+        "piero pirupa",
+        "osunlade",
+        "mochakk",
+        "roosevelt ",
+        "young franco",
+        "ian carey",
+        "martin solveig",
+        "alex gaudino",
+        "enur ",
+        "calabria ",
+        "laurent wolf",
+        "alexandra stan",
+        "jax jones", "jax_jones",
+        "aronchupa",
+        "twocolors",
+        "wamdue project", "wamdue ",
+        "rudenko ",
+        "robin_schulz",
+        "ida corr",
+        "alan walker",
+        "a-trak",
+        "maribou state",
+        "fakear",
+        "kerala dust",
+        "golden vessel",
+        "baynk",
+        "black strobe",
+        "debruit",
+        "light asylum",
+        "bellaire",
+        "idris dauwd",
+        "riton",
+        "salt cathedral",
+        "tony romera",
+        "the supermen lovers",
+        "poolside ",
+        "sleepy fish",
+        "peaches ",
+        "yosi horikawa",
+        "pilocka krach",
+        "etienne jaumet",
+        "koreless",
+        "fasme",
+        "tentendo",
+        "stussko",
+        "sandhog",
+        "coro ",
+        "delerium",
+        "neil cicierega",
+        "passion fruit ",
+        "alexander marcus",
+        "esg ",
+        # ─ Added v14 ─
+        "rikslyd",
+        "tom jarmey",
+        "choopsie",
+        "tonite only",
+        "tobacco ",
+        "oka ",
+        "naoba",
+        "rigopolar",
+        "0303am",
+        "renan ferrari",
+        "arling & cameron", "arling and cameron",
+        "giua",
+        "deekline",
+        "adi ulmansky",
+        "ecstasis",
+        "elation station",
+        "dubdogz",
+        "snollebo",
+        "numa ",
+        "polish ambassador",
+        "alban",
+        "nghtwrk",
+        "hoken",
+        "kingdom ",
+        "autoload",
+        "hermetico",
+        "touch and go",
+        "snake city",
+        "soda ",
+        "joost ",
+        "bomel",
+        "superheld",
+        "aerodynamite",
+        "hohm",
+        "hxrt",
+        "mou5zyzz",
+        "aiio",
+        "møme",
+        "insomnia",
+        "parallells",
+        "sp3ctrum",
+        "psyched3lic",
+        "peace sine",
+        "trainman",
+        "tambour battant",
+        "vurt",
+        "nowifi",
+        "intr0beatz",
+        "tony shades",
+        "orenda",
+        "umbilical moonrise",
+        "with you friends",
+        "art school girlfriend",
+        "hundred waters",
+        "tkdjs",
+        "tabasco project",
+        "levyticus",
+        "life of dillon",
+        "lo wolf",
+        "j ember",
+        "jaykode",
+        "excentric",
+        "highbloo",
+        "nokturn",
+        "antois",
+        "countach",
+        "shadow age",
+        "autumn glow",
+        "bliss looper",
+        "siren tourist",
+        "acheless",
+        "cardiac half",
+        "claraty",
+        "dolce tiva",
+        "benji lewis",
+        "koni ",
+        "rob & chris",
         # ─ Genre terms ─
-        "psytrance", "psy trance", "psy-trance",
-        "goa trance", "goa ",
-        "progressive psy", "full on", "fullon",
-        "techno ", "trance ",
-        "dubstep", "drum and bass", "drum & bass", "dnb",
         "ambient ",
         "edm ", "electro ",
         "synth ", "synthwave",
-        "melodic techno",
         "breaks ", "breakbeat",
-        "neurofunk", "liquid dnb",
-        "hardstyle", "hardcore", "gabber",
         "glitch hop", "glitch",
         "idm ", "experimental",
-        # ─ Added v17: expanded electronic subgenres from genre databases ─
-        "acid techno", "detroit techno", "minimal techno", "schranz",
-        "acid trance", "uplifting trance", "vocal trance", "hard trance",
-        "dark psy", "dark psytrance", "suomisaundi",
-        "drum n bass", "drum'n'bass", "drumstep", "darkstep",
-        "liquid funk", "jump-up", "jump up", "drumfunk",
-        "intelligent drum", "techstep",
-        "chillstep", "brostep", "riddim ",
         "downtempo", "trip hop", "trip-hop", "triphop",
         "chillout", "chill out", "chill-out", "balearic",
         "vaporwave", "synthpop", "synth-pop", "synth pop",
@@ -1199,193 +1352,10 @@ GENRE_RULES = [
         "industrial ", "ebm ", "aggrotech",
         "future garage", "future house",
         "8bit", "chiptune", "bitpop",
-        "breakcore", "speedcore", "terrorcore", "doomcore",
-        "uk hardcore", "happy hardcore", "makina ",
-        "jumpstyle", "hardstep",
-        "bass music", "uk bass", "bassline",
         "folktronica", "indietronica",
         "noise ", "japanoise", "power electronics",
         "drone ", "dark ambient",
         "lo-fi ", "lofi ",
-        # ─ Added v7: electronic / DJ producers from INBOX analysis ─
-        "perc ",                  # Perc (Ali Wells) — UK techno — trailing space
-        "mura masa",              # UK electronic/pop producer (Love$ick, Lovesick)
-        "noizu ",                 # Canadian house/techno DJ — trailing space
-        "tim berg",               # Avicii's early alias (Seek Bromance)
-        "whethan",                # American future bass/pop-electronic producer
-        "klingande",              # French tropical/chillout house producer (Jubel)
-        "tungevaag",              # Norwegian DJ/producer (Dynamite)
-        "mousse t",               # German-Tunisian house/funk producer (Horny)
-        "piero pirupa",           # Italian progressive/melodic house DJ
-        "osunlade",               # American deep/afro-house producer (Envision)
-        "mako ",                  # UK drum & bass duo — trailing space
-        "mochakk",                # Brazilian house/electronic producer
-        "roosevelt ",             # German indie-electro pop artist — trailing space
-        "young franco",           # Australian electronic/pop producer
-        "ian carey",              # American house DJ/producer (Keep On Rising)
-        "rank1",                  # Dutch uplifting trance duo (Airwave)
-        "pleasurekraft",          # German techno duo (Tarantula)
-        # ─ Added v8: electronic artists from full INBOX analysis ─
-        "martin solveig",         # French house/electro-pop (Hello, Intoxicated, +1)
-        "guru josh",              # British trance/house (Infinity 2008, Infinity)
-        "alex gaudino",           # Italian house (Destination Calabria)
-        "enur ",                  # Danish-US house (Calabria 2007) — trailing space
-        "calabria ",              # keyword for Calabria tracks — trailing space
-        "laurent wolf",           # French electro-pop (No Stress, Wash My World)
-        "alexandra stan",         # Romanian electronic-pop (Mr Saxobeat, Get Back)
-        "jax jones",              # UK dance/electronic (You Don't Know Me, Breathe)
-        "aronchupa",              # Swedish pop-EDM (I'm an Albatraoz, Little Swing)
-        "twocolors",              # German electronic-pop (Lovefool, Nightbound)
-        # ─ Added v9: electronic/dance artists from full INBOX analysis ─
-        "wamdue project",         # House/big beat (King of my Castle)
-        "wamdue ",                # trailing space variant
-        "wilkinson ",             # UK drum and bass (Dirty Love, Afterglow) — trailing space
-        "troyboi ",               # UK trap/bass (Do You, After Hours) — trailing space
-        "rudenko ",               # Dance/electronic (Everybody) — trailing space
-        "robin_schulz",           # German house DJ — underscore variant (filenames use underscores)
-        "ida corr",               # Danish house vocalist (Let Me Think About It, Free Me)
-        # ─ Added v10: electronic artists from INBOX analysis ─
-        "alan walker",            # Norwegian DJ/producer (Faded, Alone, Darkside, Space Melody)
-        "a-trak",                 # Canadian DJ/turntablist (Parallel Lines, All I Need)
-        "zomboy ",                # UK dubstep/bass music producer (Patient Zero) — trailing space
-        # ─ Added v11: electronic artists from INBOX analysis ─
-        "maribou state",          # UK electronic duo (One Chance, Turnmills, Tongue)
-        "fakear",                 # French electronic producer (Golden Sun, Animal)
-        "jan blomqvist",          # German melodic techno/house (Empty Floor, Remote)
-        "kerala dust",            # UK electronic duo (Swoon, Heartline, Way Out)
-        "golden vessel",          # Australian electronic producer (flaws, Lifespan)
-        "baynk",                  # New Zealand electronic producer (Someone, Easy)
-        "black strobe",           # French electro/rock-dance (I'm a Man, Boogie In Zero Gravity)
-        "debruit",                # French electronic producer (Istanbul is Sleepy, From the Horizon)
-        "light asylum",           # Brooklyn darkwave/electronic (IPC, Skull Fuct)
-        "bellaire",               # Dutch electronic producer (Everything I Know, You There)
-        # ─ Added v12: electronic artists from INBOX analysis ─
-        "idris dauwd",            # UK-Libyan electronic producer (Gear, Cities, Lifetime)
-        "carlita",                # Egyptian-German melodic house/techno DJ (Momo, Opa Opa)
-        "riton",                  # UK electronic/house producer (Rinse & Repeat ft. Haile, Brighter Days)
-        "salt cathedral",         # Colombian electronic indie duo (Cool, All Day)
-        "tony romera",            # French electro/bass-house producer (Superman, Fire)
-        "the supermen lovers",    # French electro-house duo (Starlight, My Magic Dream)
-        "dan caster",             # German house/techno DJ (Closer, Spirit)
-        "tom wax",                # German trance/techno producer (No Rush, Wax On)
-        "ahadadream",             # UK bass/electronic producer (Keel Over, Soot)
-        "chemical_brothers",      # The Chemical Brothers — underscore variant for filenames
-        "jax jones",              # UK electronic/house producer (You Don't Know Me, Instruction)
-        "jax_jones",              # underscore variant for filenames
-        "poolside ",              # LA electronic/yacht-disco duo (Slow Down, Do You Believe) — trailing space
-        "sleepy fish",            # Japanese lo-fi/electronic producer (Solace, Falling)
-        "taiki nulight",          # UK DnB/bass-house producer (Spit, Get Low)
-        "serial killaz",          # UK drum & bass duo (Warzone, Time Flies)
-        "peaches ",               # Canadian electroclash artist (Fuck the Pain Away, Boys Wanna Be Her) — trailing space
-        # ─ Added v13: electronic artists from INBOX analysis ─
-        "frederic robinson",      # UK liquid DnB / electronic producer
-        "yosi horikawa",          # Japanese experimental electronic (Bubbles, Wandering)
-        "pilocka krach",          # German experimental electronic
-        "etienne jaumet",         # French electronic/synth artist (Night Music)
-        "hucci",                  # Australian trap/electronic producer
-        "koreless",               # Welsh electronic producer (Sun, 4D)
-        "fasme",                  # French electronic/pop artist
-        "cirqular",               # Electronic/bass music producer
-        "subb theory",            # UK dubstep/electronic producer
-        "neuroplasm",             # Electronic/psychedelic bass artist
-        "tentendo",               # Electronic/ambient producer
-        "stussko",                # Electronic producer
-        "deekapz",                # Electronic/bass producer
-        "sandhog",                # Electronic artist
-        "coro ",                  # Electronic project — trailing space
-        "delerium",               # Canadian ambient/electronic (Silence ft. Sarah McLachlan)
-        "neil cicierega",         # US mashup/electronic (Mouth Sounds, Mouth Moods)
-        "passion fruit ",         # Electronic/dance act — trailing space
-        "alexander marcus",       # German electrolore artist (Hawaii Toast Song)
-        "clipz",                  # UK drum & bass producer
-        "matrix & futurebound",   # UK drum & bass duo (Magnetic Eyes, Fire)
-        "outsiders & dickster",   # Psytrance duo
-        "tristan & bliss",        # Psytrance artists
-        "esg ",                   # NYC post-punk/electronic (UFO, My Love for You) — trailing space
-        # ─ Added v14: Electronic artists from deep INBOX research ─
-        "rikslyd",                     # electronic artist
-        "tom jarmey",                  # electronic artist
-        "choopsie",                    # electronic artist
-        "lcd soundsystem",             # electronic band
-        "tonite only",                 # electronic artist
-        "tobacco ",                    # electronic artist — trailing space
-        "oka ",                        # electronic artist — trailing space
-        "naoba",                       # electronic artist
-        "rigopolar",                   # electronic artist
-        "0303am",                      # electronic artist
-        "renan ferrari",               # electronic artist
-        "arling & cameron",            # electronic duo
-        "arling and cameron",          # variant
-        "giua",                        # electronic artist
-        "deekline",                    # electronic artist
-        "adi ulmansky",                # Israeli electronic
-        "ecstasis",                    # track keyword
-        "elation station",             # track keyword
-        "dubdogz",                     # electronic artist
-        "snollebo",                    # electronic artist
-        "numa ",                       # electronic artist — trailing space
-        "willem de roo",               # electronic artist
-        "polish ambassador",           # electronic artist
-        "kalkbrenner",                   # Paul Kalkbrenner — techno
-        "alban",                         # Dr. Alban — eurodance
-        "nghtwrk",                       # NGHTWRK — electronic producer
-        "hoken",                         # HÖKEN — electronic
-        "kingdom ",                      # Kingdom — electronic producer
-        "autoload",                      # Autoload — electronic
-        "hermetico",                     # Hermetico — electronic
-        "touch and go",                  # Touch And Go — electronic
-        "snake city",                    # Snake City — electronic
-        "soda ",                         # Soda — electronic producer
-        "joost ",                        # Joost — electronic/pop
-        "bomel",                         # Bomel — electronic edit
-        "superheld",                     # Rob & Chris — electronic
-        "aerodynamite",                  # Daft Punk — electronic
-        "dubtazer",                      # Dubtazer — psy-dub
-        "hohm",                          # Hohm — electronic
-        "hxrt",                          # HXRT — electronic
-        "mou5zyzz",                      # Mou5ZyZZ — electronic
-        "aiio",                          # Mr.Aiio — electronic
-        "møme",                          # Møme — French electronic
-        "insomnia",                      # Faithless — electronic classic
-        "parallells",                    # Parallells — electronic
-        "sp3ctrum",                      # SP3CTRUM — electronic
-        "psyched3lic",                   # Psyched3lic — electronic
-        "peace sine",                    # Peace Sine — electronic
-        "trainman",                      # The Trainman — electronic
-        "tambour battant",               # Tambour Battant — French electronic
-        "vurt",                          # Vurt — electronic
-        "nowifi",                        # nowifi — electronic
-        "intr0beatz",                    # Intr0beatz — electronic
-        "tony shades",                   # Tony Shades — electronic
-        "orenda",                        # Orenda — electronic
-        "umbilical moonrise",            # Umbilical Moonrise — electronic
-        "with you friends",              # Skrillex — electronic
-        "art school girlfriend",         # Art School Girlfriend — electronic
-        "hundred waters",                # Hundred Waters — electronic
-        "tkdjs",                         # TKDJS — electronic
-        "tabasco project",               # Black Tabasco Project — electronic
-        "levyticus",                     # LEVYTICUS — electronic
-        "life of dillon",                # Life of Dillon — electronic
-        "lo wolf",                       # Lo Wolf — electronic
-        "j ember",                       # j ember — electronic
-        "jaykode",                       # JayKode — electronic
-        "excentric",                     # Excentric — electronic
-        "highbloo",                      # Highbloo — electronic
-        "nokturn",                       # Nokturn — electronic
-        "antois",                        # Antois — electronic
-        "countach",                      # Countach — Italo-disco/electronic
-        "shadow age",                    # Shadow Age — electronic
-        "autumn glow",                   # Autumn Glow — electronic
-        "bliss looper",                  # Bliss Looper — electronic
-        "siren tourist",                 # Siren Tourist — electronic
-        "acheless",                      # Acheless — electronic
-        "cardiac half",                  # Cardiac Half — electronic
-        "claraty",                       # Claraty — electronic
-        "chillstep",                     # chillstep — electronic genre tag
-        "dolce tiva",                    # Dolce Tiva — electronic
-        "benji lewis",                   # Benji Lewis — electronic/indie
-        "koni ",                         # Koni — electronic (trailing space)
-        "rob & chris",                   # Rob & Chris — electronic
     ]),
 
     # ── Rock & Alternative ────────────────────────────────────────────────────
@@ -2042,6 +2012,94 @@ GENRE_RULES = [
         "adult contemporary", "easy listening",
         "chanson", "french pop",
     ]),
+    ("israeli_unicode", None),
+
+    ("israeli", [
+        # ─ Verified Israeli artists (from tracklist analysis) ─
+        "quarter to africa",
+        "made in tlv",
+        # darwish moved to trance section
+        "yoel lewis",
+        "riff cohen",
+        "noga erez",
+        "red axes",
+        # ─ Mizrahi / mainstream Israeli pop ─
+        "eyal golan", "eden ben zaken", "eden ben-zaken",
+        "moshe peretz", "kobi peretz", "sarit hadad", "dudu aharon",
+        "boaz sharabi", "omer adam", "noa kirel", "bar gofer",
+        "lior nini", "avraham tal", "shai gabso", "shiri maimon",
+        "keren peles", "harel skaat", "marina maximilian", "ninet tayeb",
+        "ziv navon", "ido netanyahu", "ziv yehezkel",
+        "idan amedi", "ishay ribo", "omer klein",
+        "margalit tzanani", "avi biter", "yigal bashan",
+        "zehava ben", "zohar argov", "moshe giat", "arik shadmi",
+        "lea shabat", "shoshana damari", "yaffa yarkoni",
+        "shlomo artzi", "shalom chanoch", "yehoram gaon", "gali atari",
+        "zvika pick", "ofra haza", "arik einstein",
+        "izhar cohen", "nurit galron", "gidi gov", "uzi hitman",
+        "rami kleinstein", "ilana avital", "orna portath", "yoni rechter",
+        "chava alberstein", "naomi shemer",
+        "david broza", "shlomi shabat", "shlomi shaban",
+        "yehuda poliker", "rita ",
+        "ivri lider", "eran tzur",
+        "miri aloni", "mosh ben ari", "mosh & tuk",
+        "corinne allal", "achinoam nini",
+        "ehud banai", "yossi banai", "meir banai", "yuval banai",
+        "yaakov shwekey", "mordechai ben david",
+        "danny sanderson", "karolina",
+        "nikki levy",
+        # ─ Israeli rock / indie ─
+        "hadag nahash", "hadag",
+        "knesiyat hasekhel", "knesiyat",
+        "rockfour", "tislam", "minimal compact",
+        "asaf avidan", "aviv gefen",
+        "static ben el", "static & ben", "static and ben",
+        # ─ Israeli hip-hop ─
+        "subliminal", "hip hop gal", "hatikva 6", "hatikva6",
+        "mook-e", "sagol 59",
+        # ─ Israeli electronic (psytrance artists now in trance section) ─
+        "borgore",
+        # ─ Genre / language terms ─
+        "mizrahi", "mizrachit", "mizrakhi", "mizrachi",
+        "yemenite", "sephardi", "sfaradi",
+        "israeli", "israelit", "hebrew",
+        "pizmon", "shira", "nigun",
+        # ─ Common transliterated Hebrew words that appear in titles ─
+        "ahava", "ahavah", "ahavat",
+        "hayam", "habayit", "haboker", "hatikva",
+        "neshama", "neshamot",
+        "yerushalayim", "jerusalem", "eretz",
+        "shabbat", "shabbos", "chag sameach",
+        "mazal tov", "mazel tov",
+        "sababa", "achi", "yalla",
+        "am yisrael", "yisrael",
+        "sashka ",
+        # ─ Added v6 ─
+        "dana international",
+        "eviatar banai",
+        "avihu pinhasov",
+        "nadav guedj",
+        "ravid ",                # Ravid Plotnik / Ravid Kahalani / Ravid Alma
+        "laor ",                 # Laor (singer)
+        "zohar bar shalom",
+        # ─ Added v11: Israeli artists from INBOX analysis ─
+        "arutz hakibud",          # Israeli phrase / artist reference
+        # ─ Added v12: Israeli artists from INBOX analysis ─
+        "hamefakedet",            # HaMefakedet — Israeli TV show theme / viral music
+        "ninet ",                 # Ninet Tayeb — Israeli singer (Tfilati, Bo) — trailing space
+        "ben el tavori",          # Ben El Tavori — Israeli Mizrahi pop (Shir Meyuchad)
+        "zafrir ifrach",          # Zafrir Ifrach — Israeli musician
+        # ─ Added v13: Israeli artists from INBOX analysis ─
+        "basimlah",               # BaSimlah Aduma — Israeli band
+        "dr casper",              # Dr. Casper — Israeli hip-hop/electronic artist
+        # ─ Added v14: Israeli artists from deep INBOX research ─
+        "kafkaf",                 # Israeli artist
+        "- netta",                # Eurovision 2018 "Toy" — uses dash-prefix to avoid "estoy" false positive
+        "mifgash",                # Israeli artist/group
+        "dale promo",                    # Noa Kirel — Israeli artist
+        "toy - israel",                  # TOY — Eurovision 2018 Israeli entry
+        "buttering trio",                # Buttering Trio — Israeli jazz-funk
+    ]),
 
     # ── Classics & Oldies ─────────────────────────────────────────────────────
     ("classics", [
@@ -2383,28 +2441,22 @@ GENRE_RULES = [
         "tamer hosny", "arab music",
         "arabic", "arab ", "oud ", "tabla ",
         "turkish", "greek laika",
-        # ─ African ─
-        "fela kuti", "fela ",
+        # ─ African (traditional / folk — modern afrobeats in afrobeats section) ─
         "youssou n'dour", "salif keita",
         "miriam makeba", "hugh masekela",
         "baaba maal", "ali farka toure",
-        "afrobeats", "afropop",
-        "amapiano", "gqom",
         "buena vista", "oumou sangare",
         # ─ Indian / Bollywood ─
         "bollywood", "bhangra",
         "ar rahman", "a.r. rahman",
         "dj aqeel", "dj chetas",
         "punjabi mc", "panjabi mc",
-        # ─ Reggae / Jamaica ─
-        "reggae", "dancehall", "ska ",
+        # ─ Reggae / Jamaica (dancehall artists moved to afrobeats section) ─
+        "reggae", "ska ",
         "bob marley", "marley",
         "peter tosh", "bunny wailer",
         "jimmy cliff", "toots",
         "burning spear", "culture ",
-        "shabba ranks", "buju banton",
-        "beenie man", "sean paul",
-        "shaggy", "vybz kartel",
         # ─ Brazilian / Latin world ─
         "bossa nova", "samba ",
         "caetano veloso", "gilberto gil",
@@ -2466,12 +2518,11 @@ GENRE_RULES = [
         # ─ Added v7: world artists from INBOX analysis ─
         "hotei ",                 # Tomoyasu Hotei — Japanese rock guitarist (Battle Without Honor or Humanity) — trailing space
         "meiko kaji",             # Japanese actress/singer (Flower of Carnage, Lady Snowblood OST)
-        "magic system",           # Ivorian coupé-décalé group (Premier Gaou)
-        "lijadu sisters",         # Nigerian Afrobeat pioneers (Danger)
+        # magic system + lijadu sisters moved to afrobeats section
         "zventa sventana",        # Russian ethno-folk fusion group
         # ─ Added v8: world artists from full INBOX analysis ─
         "dawn penn",              # Jamaican reggae (No No No, You Don't Love Me)
-        "aya nakamura",           # French-Malian Afro-pop (Djadja, Pookie, Copines)
+        # aya nakamura moved to afrobeats section
         "rodrigo ",               # Argentine folk singer (La Mano de Dios, El Indio) — trailing space
         # ─ Added v9: world artists from full INBOX analysis ─
         "the congos",             # Jamaican roots reggae (Fisherman, Ark of the Covenant)
@@ -2484,7 +2535,7 @@ GENRE_RULES = [
         "sharmoofers",            # Egyptian indie pop band (Enta Meen, Mabyen Aleik)
         "joao selva",             # French-Brazilian musician (Pitanga, Macumba Virou Cha)
         # ─ Added v12: world artists from INBOX analysis ─
-        "wizkid",                 # Nigerian Afrobeats superstar (Essence, Come Closer ft. Drake)
+        # wizkid moved to afrobeats section
         "playing for change",     # World music project — global musician collaborations (Stand by Me)
         "laya project",           # World music film/album (Va Va Voom, Chale Chalo)
         "the slickers",           # Jamaican reggae (Johnny Too Bad — The Harder They Come OST)
@@ -2492,7 +2543,7 @@ GENRE_RULES = [
         "planet drum",            # Mickey Hart (Grateful Dead) world percussion project
         # ─ Added v13: world artists from INBOX analysis ─
         "athena ",                # Greek pop/rock band — trailing space
-        "bombo clat",             # World bass / dancehall crossover
+        # bombo clat moved to afrobeats section
         "drumspyder",             # Ecstatic dance / world percussion producer
         "enta omri",              # Arabic song title (Umm Kulthum classic — extra catchall)
         "james asher",            # UK world music / new age percussionist
@@ -2503,21 +2554,18 @@ GENRE_RULES = [
         "didgeridoo", "native american",
         "deep forest", "enigma ",
         "world beat",
-        # ─ Added v17: expanded world subgenres from genre databases ─
-        "afrobeat", "afro-beat", "afropop", "afro-pop",
-        "afro-house", "highlife", "soukous", "makossa",
-        "mbalax", "juju ", "fuji music", "kwaito",
-        "bongo flava", "gqom ", "amapiano",
-        "kuduro", "semba ", "coupe decale", "coupé-décalé",
+        # ─ Expanded world subgenres (afrobeats/amapiano/dancehall in afrobeats section) ─
+        "afro-house",
+        "mbalax", "juju ", "fuji music",
         "gnawa", "rai ", "raï ",
         "bhangra", "bollywood", "filmi ",
         "dangdut", "gamelan",
         "celtic ", "klezmer", "balkan",
         "polka ", "zydeco",
-        "roots reggae", "dub ", "dancehall",
+        "roots reggae", "dub ",
         "ska ", "rocksteady", "lovers rock",
         "reggae ", "ragga ", "raggamuffin",
-        "calypso", "mento ",
+        "mento ",
         "fado ", "rebetika", "laiko",
         "throat singing", "overtone singing",
         "ecstatic dance", "kirtan", "mantra",
