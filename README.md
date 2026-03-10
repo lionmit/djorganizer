@@ -1,136 +1,105 @@
-# DJ Music Crate Sorter
+# DJOrganizer
 
-Auto-sort script for a DJ music library using filename keyword analysis.
-Built for **Lionel Mitelpunkt** · Pioneer DDJ-FLX4 · Rekordbox 7
+Auto-sort your DJ music library into genre folders. No code, no API keys, no internet — just double-click and go.
+
+**1,000+ artist and genre keywords** refined across 16 versions. Tested on a 6,000+ track library with 95.6% classification accuracy.
 
 ---
 
-## What It Does
+## How It Works
 
-`sort_main_crate.py` classifies every file in your Main Crate into genre sub-folders under `DJ_MUSIC/`, using a keyword-matching classifier against the audio filename. No audio analysis, no API calls — pure fast Python.
+DJOrganizer reads your track filenames, matches them against a curated keyword engine (artist names, labels, genre terms, language markers), and sorts them into genre folders. Unclassified tracks go to `00_INBOX/` for your manual review.
 
-**Folder structure created:**
+**No audio analysis.** No external services. Works offline, runs in seconds.
 
-| Folder | Genre |
-|--------|-------|
-| `01 Israeli & Hebrew` | Israeli / Hebrew-language music |
-| `02 Hip-Hop & R&B` | Hip-hop, rap, R&B, soul |
+---
+
+## Quick Start (Mac)
+
+1. **Download** — Click the green "Code" button above → "Download ZIP". Unzip it.
+2. **Double-click** `DJOrganizer.command`
+3. **Tell it where your music is** — drag your music folder into the terminal window
+4. **Preview** — see where every track will go (nothing moves yet)
+5. **Confirm** — type `y` to sort for real
+
+That's it. If you use Rekordbox, open it after and do: **File → Library → Relocate → Auto Relocate** to reconnect your cue points.
+
+---
+
+## Quick Start (Windows)
+
+1. Download and unzip
+2. Open Command Prompt (press Windows key, type `cmd`, press Enter)
+3. Navigate to the folder: `cd Desktop\djorganizer`
+4. Run: `python sort_main_crate.py`
+5. Follow the prompts
+
+---
+
+## Works With Any Folder
+
+Internal drive, USB stick, external SSD, SD card — DJOrganizer asks you where your music is on first run. Your settings are saved so you only configure once.
+
+To reconfigure anytime: `python3 sort_main_crate.py --reset`
+
+---
+
+## Genre Folders
+
+| Folder | What Goes Here |
+|--------|---------------|
+| `01 Israeli & Hebrew` | Mizrahi, Israeli pop, Hebrew-language music |
+| `02 Hip-Hop & R&B` | Hip-hop, rap, R&B, grime, drill |
 | `03 House & Dance` | House, deep house, disco, dance |
-| `04 Electronic` | Electronic, techno, drum & bass, ambient |
-| `05 Pop & Commercial` | Pop, indie-pop, commercial |
+| `04 Electronic` | Techno, trance, drum & bass, ambient |
+| `05 Pop & Commercial` | Pop, indie-pop, commercial hits |
 | `06 Rock & Alternative` | Rock, punk, indie, metal, shoegaze |
-| `07 Latin` | Latin, reggaeton, salsa, bossa nova |
+| `07 Latin` | Reggaeton, salsa, bachata, Brazilian, cumbia |
 | `08 Classics & Oldies` | Pre-1990 / golden era music |
 | `09 World & Ecstatic` | World music, African, reggae, Afrobeats |
-| `10 Remixes` | Unclassified remixes (catch-all) |
-| `00_INBOX` | Unclassified — requires manual review |
+| `10 Tools & FX` | Stems, acapellas, samples, DJ tools |
+| `11 Remixes` | Unclassified remixes |
+| `00_INBOX` | Unclassified — needs your manual review |
 
 ---
 
-## Quick Start
+## Command Reference
 
-```bash
-# 1. Preview — shows what would move where (NO files touched)
-python3 sort_main_crate.py --preview
-
-# 2. Execute — actually moves the files
-python3 sort_main_crate.py --execute
-```
-
-**Always run `--preview` first and sanity-check the output before executing.**
+| Command | What It Does |
+|---------|-------------|
+| `python3 sort_main_crate.py` | Interactive mode — setup + preview + confirm |
+| `python3 sort_main_crate.py --preview` | Preview only (no files moved) |
+| `python3 sort_main_crate.py --execute` | Sort files for real |
+| `python3 sort_main_crate.py --reset` | Clear saved settings |
 
 ---
 
-## Rekordbox 7 Workflow
+## Tracks in the Wrong Folder?
 
-After running `--execute`, Rekordbox 7 won't know your files moved. Fix this in one step:
+The keyword engine is community-powered. If a track gets misclassified:
 
-1. Open **Rekordbox 7**
-2. Go to **File → Library → Relocate → Auto Relocate**
-3. Rekordbox will scan and reconnect all moved files to their existing cue points, loops, and beat grids
-
-No cue data is lost. Auto Relocate handles it automatically.
+1. [Open an issue](https://github.com/lionmit/djorganizer/issues/new) with the filename and correct genre
+2. Or edit the keyword lists in `sort_main_crate.py` directly and submit a pull request
 
 ---
 
-## Configuration
+## The Story
 
-Edit the top of `sort_main_crate.py`:
+DJOrganizer was built without writing a single line of code manually. The entire tool — from first prototype to the version you're using now — was created through conversation with [Claude Code](https://claude.ai/claude-code).
 
-```python
-MAIN_CRATE    = Path("/Users/Lionmit/Music/Main Crate")
-DJ_MUSIC_ROOT = Path("/Users/Lionmit/Music/DJ_MUSIC")
-```
+It started at Midburn (the Israeli Burning Man) with two phones and an analog mixer. 6,000+ tracks and 16 versions later, the library sorts itself in seconds.
 
-Change these paths to match your system if needed.
+Read the full build log: [creative-gym-67.vercel.app/log.html](https://creative-gym-67.vercel.app/log.html)
 
 ---
 
-## How Classification Works
+## Requirements
 
-1. Each filename is lowercased and Unicode-normalized (NFC)
-2. Files with Hebrew characters (U+0590–U+05FF) → `01 Israeli & Hebrew`
-3. Files matching the `tools` list (stems, acapellas, etc.) → separate tools folder
-4. Each genre has a keyword list; **first match wins** (order matters)
-5. Songs with years 1900–1989 in parentheses or brackets → `08 Classics & Oldies`
-6. Anything unmatched → `00_INBOX` for manual review
-
-**Key design choices:**
-- Trailing spaces on keywords (e.g. `"ghost "`) prevent false substring matches
-- Underscore variants (e.g. `"a_certain_ratio"`) handle filenames with underscores instead of spaces
-- Accent variants (e.g. `"the marías"` alongside `"the marias"`) handle NFC-normalized filenames
-- Artist nationality ≠ genre (e.g. Dennis Lloyd → Pop, not Israeli)
-- Remix rule runs last — known artists still go to their genre first
+- **Python 3.6+** (free from [python.org/downloads](https://python.org/downloads))
+- That's it. No pip install, no dependencies, no packages.
 
 ---
 
-## Progress History
+## License
 
-| Version | INBOX | Tracks Rescued | Notes |
-|---------|-------|----------------|-------|
-| Baseline | 26.3% (993) | — | Starting point |
-| v7+v8 | 22.0% (831) | 162 | 80+ artists, all genres |
-| v9 | 20.7% (781) | 50 | Electronic / house deep-dive |
-| v10 | 19.3% (730) | 51 | Rock, pop, classics, world |
-| v11 | 18.1% (683) | 47 | Accent fixes, underscore variants |
-| **v12** | **16.4% (619)** | **64** | **60+ artists, song-title keywords** ✅ |
-
-Target: **15–20% INBOX** (reached at v11, improved further at v12)
-Total library: **3,776 tracks**
-
----
-
-## Simulation Tool
-
-`simulate.py` lets you test the classifier against a tracklist without touching any files:
-
-```bash
-python3 simulate.py sort_main_crate.py tracklist.txt
-```
-
-`tracklist.txt` should be a plain-text file with one filename per line.
-Results are printed with folder distribution and INBOX percentage.
-INBOX filenames are written to `/tmp/inbox_v6.txt` for analysis.
-
----
-
-## Adding More Keywords
-
-To improve classification, edit `sort_main_crate.py` and add entries to the relevant genre's keyword list. Guidelines:
-
-- Add both `"artist name"` and `"artist_name"` if files may use underscores
-- Add both accented and unaccented variants: `"rosalía"` and `"rosalia "`
-- Use a trailing space on short/common words to avoid false matches: `"ghost "` not `"ghost"`
-- Song-title keywords work well for tracks where the artist isn't in the filename
-- Re-run simulation after each batch to verify improvement
-
----
-
-## Files
-
-| File | Description |
-|------|-------------|
-| `sort_main_crate.py` | Main classifier script (v12) |
-| `simulate.py` | Simulation tool — test without moving files |
-| `tracklist.txt` | Your library tracklist (one filename per line) |
-| `README.md` | This file |
+CC-BY 4.0 — Lionel Mitelpunkt

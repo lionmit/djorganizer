@@ -1,53 +1,39 @@
 #!/usr/bin/env python3
 """
-sort_main_crate.py — Auto-sort script for Lionel Mitelpunkt's DJ library
-==========================================================================
-Classifies every file in your Main Crate into genre-based sub-folders
-under DJ_MUSIC/, using filename keyword analysis.
+DJOrganizer — Auto-Sort Your DJ Music Library by Genre
+=======================================================
+Classifies every audio file in your music folder into genre sub-folders
+using filename keyword analysis. No audio analysis, no API keys, no
+internet connection — just smart keyword matching refined across 16
+versions with 1,000+ artist and genre keywords.
 
-VERSION 16 — v16 keyword batch applied (2026-03)
-  Progress trajectory (3,776 tracks total):
-    Baseline  → 26.3% INBOX (993 tracks)
-    v7+v8     → 22.0% (831 tracks)
-    v9        → 20.7% (781 tracks)
-    v10       → 19.3% (730 tracks)
-    v11       → 18.1% (683 tracks)  ← accent + underscore fixes
-    v12       → 16.4% (619 tracks)
-    v13       → 12.7% (480 tracks)  ← deep research on all 619 remaining INBOX
-    v14       → 9.9%  (372 tracks)  ← 132 new keywords from exhaustive INBOX research
-    v15       → 8.0%  (301 tracks)  ← 93 new keywords from deep INBOX research
-    v16       → 4.4%  (167 tracks)  ← 133 new keywords from exhaustive INBOX research
-
-  Each version = one full analysis of INBOX + targeted keyword batch:
-    • v7/v8: 80+ artists across all genres (993-track INBOX)
-    • v9:    electronic / house deep-dive
-    • v10:   rock, pop, classics, world expansion
-    • v11:   accent fixes (marías, jhené), underscore variants, 50+ artists
-    • v12:   60+ artists + song-title keywords + underscore/accent fixes
-    • v13:   150+ keywords — deep research on all 619 remaining INBOX tracks
-    • v14:   132 keywords — exhaustive research on all 480 remaining INBOX tracks
-    • v15:   93 keywords — deep research on all 372 remaining INBOX tracks
-    • v16:   133 keywords — exhaustive research on all 301 remaining INBOX tracks
-
-  DJ setup: Pioneer DDJ-FLX4, Rekordbox 7
+Created by Lionel Mitelpunkt with Claude Code.
+Open source — CC-BY 4.0 — https://github.com/lionmit/djorganizer
 
 USAGE:
-  python3 sort_main_crate.py --preview    ← shows plan, moves NOTHING
-  python3 sort_main_crate.py --execute    ← runs the actual moves
+  Double-click DJOrganizer.command     ← Mac: guided setup + preview
+  python3 sort_main_crate.py           ← interactive mode (asks for folders)
+  python3 sort_main_crate.py --preview ← preview only (no moves)
+  python3 sort_main_crate.py --execute ← move files for real
+
+FIRST RUN:
+  The script asks where your music is. Settings are saved to
+  djorganizer_config.txt so you only set them once. Works with any
+  folder — internal drive, USB stick, external SSD, SD card.
 
 SAFETY:
-  - Always run --preview and check the output before --execute
+  - Always preview before executing — nothing moves until you say so
   - Unclassified files go to 00_INBOX/ for your manual review
   - No files are deleted or renamed — only moved
-  - Run Rekordbox 7: File → Relocate → Auto Relocate after executing
+  - After executing: Rekordbox → File → Relocate → Auto Relocate
 
-REKORDBOX 7 WORKFLOW:
-  1. Run: python3 sort_main_crate.py --preview
-  2. Check the output — verify folder distribution looks right
-  3. Run: python3 sort_main_crate.py --execute
-  4. Rekordbox 7: File → Library → Relocate → Auto Relocate
-     (reconnects moved files to existing cue/loop/grid data)
-  5. Manually review 00_INBOX/ and sort remaining files as needed
+GENRE FOLDERS CREATED:
+  01 Israeli & Hebrew    07 Latin
+  02 Hip-Hop & R&B       08 Classics & Oldies
+  03 House & Dance       09 World & Ecstatic
+  04 Electronic          10 Tools & FX
+  05 Pop & Commercial    11 Remixes
+  06 Rock & Alternative  00_INBOX (unclassified)
 """
 
 import os
@@ -60,11 +46,95 @@ from pathlib import Path
 from collections import defaultdict
 
 # ─────────────────────────────────────────────────────────────────────────────
-# CONFIGURATION — edit these paths if yours differ
+# CONFIGURATION — set interactively on first run, saved to config file
 # ─────────────────────────────────────────────────────────────────────────────
 
-MAIN_CRATE    = Path("/Users/Lionmit/Music/DJ_MUSIC/00_INBOX")
-DJ_MUSIC_ROOT = Path("/Users/Lionmit/Music/DJ_MUSIC")
+CONFIG_FILE = Path(__file__).parent / "djorganizer_config.txt"
+
+def _load_or_ask_config():
+    """Load saved config or ask the user interactively."""
+    # Check for saved config
+    if CONFIG_FILE.exists():
+        config = {}
+        for line in CONFIG_FILE.read_text(encoding="utf-8").splitlines():
+            if "=" in line and not line.startswith("#"):
+                key, val = line.split("=", 1)
+                config[key.strip()] = val.strip()
+        if "MAIN_CRATE" in config and "DJ_MUSIC_ROOT" in config:
+            mc = Path(config["MAIN_CRATE"])
+            dr = Path(config["DJ_MUSIC_ROOT"])
+            print(f"\n  Saved settings found:")
+            print(f"    Source folder:  {mc}")
+            print(f"    Output folder:  {dr}")
+            ans = input("\n  Use these settings? [Y/n]: ").strip().lower()
+            if ans in ("y", "yes", ""):
+                return mc, dr
+            print()
+
+    # Interactive setup
+    print()
+    print("=" * 60)
+    print("  DJOrganizer — Setup")
+    print("=" * 60)
+    print()
+    print("  I need two folders from you:")
+    print()
+    print("  1. SOURCE — where your unsorted music files are")
+    print("  2. OUTPUT — where you want the genre folders created")
+    print()
+    print("  TIP: You can drag a folder from Finder (Mac) or")
+    print("  Explorer (Windows) into this window instead of typing.")
+    print()
+
+    while True:
+        raw = input("  Source folder (your unsorted music): ").strip().strip("'\"")
+        if not raw:
+            continue
+        mc = Path(raw)
+        if mc.exists() and mc.is_dir():
+            # Count audio files to give feedback
+            count = sum(1 for f in mc.iterdir() if f.is_file() and f.suffix.lower() in AUDIO_EXTS)
+            print(f"    Found {count} audio files.")
+            if count == 0:
+                print("    No audio files found in this folder. Are you sure?")
+                confirm = input("    Continue anyway? [y/N]: ").strip().lower()
+                if confirm not in ("y", "yes"):
+                    continue
+            break
+        print(f"    Folder not found: {mc}")
+        print("    Please check the path and try again.\n")
+
+    print()
+    while True:
+        raw = input("  Output folder (where genre folders go): ").strip().strip("'\"")
+        if not raw:
+            continue
+        dr = Path(raw)
+        if not dr.exists():
+            create = input(f"    '{dr}' doesn't exist. Create it? [Y/n]: ").strip().lower()
+            if create in ("y", "yes", ""):
+                dr.mkdir(parents=True, exist_ok=True)
+                print(f"    Created: {dr}")
+                break
+            continue
+        if dr.is_dir():
+            break
+        print(f"    Not a folder: {dr}\n")
+
+    # Save config
+    CONFIG_FILE.write_text(
+        f"# DJOrganizer settings — delete this file to reconfigure\n"
+        f"MAIN_CRATE = {mc}\n"
+        f"DJ_MUSIC_ROOT = {dr}\n",
+        encoding="utf-8"
+    )
+    print(f"\n  Settings saved to {CONFIG_FILE.name}")
+    print("  (Delete that file anytime to reconfigure.)\n")
+    return mc, dr
+
+# These get set in main() after interactive config
+MAIN_CRATE    = None
+DJ_MUSIC_ROOT = None
 
 # Folder names inside DJ_MUSIC_ROOT
 FOLDERS = {
@@ -2478,8 +2548,8 @@ def get_dest_folder(genre_key):
 def collect_files():
     """Collect all audio files from MAIN_CRATE (non-recursive, flat folder)."""
     if not MAIN_CRATE.exists():
-        print(f"\nERROR: Main Crate folder not found at: {MAIN_CRATE}")
-        print("Please check the MAIN_CRATE path at the top of this script.")
+        print(f"\n  ERROR: Source folder not found: {MAIN_CRATE}")
+        print("  Run with --reset to reconfigure.")
         sys.exit(1)
 
     files = []
@@ -2550,7 +2620,7 @@ def run_execute(files):
     # Verify DJ_MUSIC_ROOT exists
     if not DJ_MUSIC_ROOT.exists():
         print(f"ERROR: DJ_MUSIC root folder not found: {DJ_MUSIC_ROOT}")
-        print("Please create the DJ_MUSIC folder structure first (see Section 2 of your plan).")
+        print("Run with --reset to reconfigure your output folder.")
         sys.exit(1)
 
     # Create destination folders if they don't exist
@@ -2625,22 +2695,64 @@ def run_execute(files):
 # ─────────────────────────────────────────────────────────────────────────────
 
 def main():
-    if len(sys.argv) < 2 or sys.argv[1] not in ("--preview", "--execute"):
-        print(__doc__)
-        print("\nUSAGE:")
-        print("  python3 sort_main_crate.py --preview    ← see the plan, no moves")
-        print("  python3 sort_main_crate.py --execute    ← run the actual moves")
+    global MAIN_CRATE, DJ_MUSIC_ROOT
+
+    # Determine mode
+    mode = None
+    if len(sys.argv) >= 2:
+        if sys.argv[1] == "--preview":
+            mode = "preview"
+        elif sys.argv[1] == "--execute":
+            mode = "execute"
+        elif sys.argv[1] == "--reset":
+            if CONFIG_FILE.exists():
+                CONFIG_FILE.unlink()
+                print("Settings cleared. Run again to reconfigure.")
+            else:
+                print("No saved settings to clear.")
+            sys.exit(0)
+
+    # Banner
+    print()
+    print("=" * 60)
+    print("  DJOrganizer — Auto-Sort Your Music Library by Genre")
+    print("  https://github.com/lionmit/djorganizer")
+    print("=" * 60)
+
+    # Interactive config
+    MAIN_CRATE, DJ_MUSIC_ROOT = _load_or_ask_config()
+
+    # Validate source folder
+    if not MAIN_CRATE.exists():
+        print(f"\n  ERROR: Source folder not found: {MAIN_CRATE}")
+        print("  Run with --reset to reconfigure, or check the path.")
+        sys.exit(1)
+
+    print(f"\n  Scanning: {MAIN_CRATE} ...")
+    files = collect_files()
+    print(f"  Found {len(files)} audio files.")
+
+    if len(files) == 0:
+        print("\n  No audio files found. Nothing to sort.")
+        print("  Check that your source folder contains .mp3, .flac, .wav, etc.")
         sys.exit(0)
 
-    print(f"\nsort_main_crate.py v3 — DJ Library Auto-Sort for Lionel Mitelpunkt")
-    print(f"Scanning: {MAIN_CRATE} ...")
-
-    files = collect_files()
-    print(f"Found {len(files)} audio files.")
-
-    if sys.argv[1] == "--preview":
+    # Interactive mode (no args): preview first, then offer to execute
+    if mode is None:
+        print()
         run_preview(files)
-    elif sys.argv[1] == "--execute":
+        print()
+        print("  Everything above is a PREVIEW — nothing has moved yet.")
+        print()
+        ans = input("  Ready to sort for real? [y/N]: ").strip().lower()
+        if ans in ("y", "yes"):
+            run_execute(files)
+        else:
+            print("\n  No files moved. Run again anytime.")
+            print("  python3 sort_main_crate.py --execute   (to sort without preview)")
+    elif mode == "preview":
+        run_preview(files)
+    elif mode == "execute":
         # Safety check: require preview to have been run first
         csv_path = Path.home() / "Desktop" / "sort_main_crate_preview.csv"
         if not csv_path.exists():

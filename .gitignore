@@ -1,4 +1,4 @@
-# Audio files
+# Audio files — never commit music
 *.mp3
 *.flac
 *.wav
@@ -8,39 +8,34 @@
 *.ogg
 *.mp4
 *.m4v
+*.wma
 
-# Personal music library folders
+# User config (created on first run)
+djorganizer_config.txt
+
+# Music library folders
 DJ_MUSIC/
 PioneerDJ/
 GarageBand/
-Music/
-"Music from diskonkey"/
-Music from diskonkey/
-"Audio Music Apps"/
-Audio Music Apps/
-"Main Crate"/
 Main Crate/
+Music from diskonkey/
+Audio Music Apps/
 
-# Personal library data files (contain your specific tracks/tags)
-rekordbox_import.xml
-tracklist.txt
-library_tags.xlsx
-tag_library.py.v5backup
-DJ_Library_Expert_Review.docx
-
-# Rekordbox DB backups
+# Personal data files
+*.xml
+*.xlsx
+*.csv
+*.txt
+*.docx
 *.backup
 *.db-wal
 *.db-shm
 
-# System / build
-*.zip
-desktop.ini
-$RECYCLE.BIN/
+# System
 __pycache__/
 *.pyc
 .DS_Store
 Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
 .localized
-echo
-
