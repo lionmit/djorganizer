@@ -1,58 +1,63 @@
 @echo off
-title DJOrganizer — Music Library Sorter
-cls
-echo.
-echo   ======================================================
-echo     DJOrganizer — Auto-Sort Your Music Library by Genre
-echo     https://github.com/lionmit/djorganizer
-echo   ======================================================
+title DJOrganizer v19
+cd /d "%~dp0"
+
+echo DJOrganizer v19 — Starting...
 echo.
 
-:: Find Python
-set PYTHON=
-where python >nul 2>nul
-if %errorlevel% equ 0 (
-    set PYTHON=python
-) else (
-    where python3 >nul 2>nul
-    if %errorlevel% equ 0 (
-        set PYTHON=python3
-    ) else (
-        echo   Python 3 is required but not installed.
-        echo.
-        echo   To install:
-        echo     1. Go to https://python.org/downloads
-        echo     2. Download Python 3
-        echo     3. IMPORTANT: Check "Add Python to PATH" during install
-        echo     4. Double-click this file again
-        echo.
-        goto :done
-    )
+:: Check Python 3
+python --version >nul 2>&1
+if errorlevel 1 (
+    echo Python 3 is required but not installed.
+    echo Download it from: https://www.python.org/downloads/
+    echo.
+    pause
+    exit /b 1
 )
 
-:: Auto-install mutagen for better track classification (one time only)
-%PYTHON% -c "import mutagen" >nul 2>nul
-if %errorlevel% neq 0 (
-    echo   Setting up for first use... (one time only)
-    echo.
-    %PYTHON% -m pip install --user mutagen --quiet >nul 2>nul
-    %PYTHON% -c "import mutagen" >nul 2>nul
-    if %errorlevel% equ 0 (
-        echo   Metadata reading enabled — more tracks will be classified
-    ) else (
-        echo   (Metadata reading unavailable — tool works fine without it)
-    )
-    echo.
+for /f "tokens=*" %%i in ('python --version') do echo Found: %%i
+
+:: Create venv if needed
+if not exist ".venv" (
+    echo Setting up environment ^(first run only^)...
+    python -m venv .venv
 )
 
-:: Run the sorter
-%PYTHON% sort_main_crate.py
+:: Activate venv
+call .venv\Scripts\activate
 
-:done
+:: Install dependencies
+echo Checking dependencies...
+pip install -r requirements.txt --quiet 2>nul
 
 echo.
-echo   ------------------------------------------------------
-echo   Done. You can close this window.
-echo   ------------------------------------------------------
+echo Launching DJOrganizer...
+echo Close this window to stop the server.
 echo.
+
+:: Start Flask and capture port from stdout
+:: Write server output to a temp file so we can parse the port
+set "PORTFILE=%TEMP%\djorganizer_port.txt"
+start /b cmd /c "python app.py > "%PORTFILE%" 2>&1"
+
+:: Wait for server to start and extract port
+set PORT=5555
+for /l %%i in (1,1,10) do (
+    timeout /t 1 >nul
+    if exist "%PORTFILE%" (
+        for /f "tokens=*" %%a in ('findstr /c:"127.0.0.1:" "%PORTFILE%"') do (
+            for /f "tokens=2 delims=:" %%b in ("%%a") do set PORT=%%b
+        )
+    )
+    if not "!PORT!"=="5555" goto :open_browser
+)
+
+:open_browser
+start http://127.0.0.1:%PORT%
+
+:: Run Flask in foreground (restart so it's the main process)
+python app.py
+
+echo.
+echo DJOrganizer stopped.
 pause

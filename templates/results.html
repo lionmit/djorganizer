@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block title %}DJOrganizer v19 — Sort Complete{% endblock %}
+
+{% block header_actions %}
+<a href="/" class="btn btn-ghost" style="font-size:0.82rem; gap:0.35rem" aria-label="Sort more files">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <line x1="19" y1="12" x2="5" y2="12"/>
+        <polyline points="12 19 5 12 12 5"/>
+    </svg>
+    Start over
+</a>
+{% endblock %}
+
+{% block content %}
+
+<div style="max-width:700px; margin:0 auto">
+
+    <!-- Hero -->
+    <div class="results-hero" id="results-hero">
+        <span class="results-icon" id="results-icon" aria-hidden="true">✅</span>
+        <h1 class="results-headline" id="results-headline">Sort complete</h1>
+        <p class="results-sub" id="results-sub">Your music library has been organised.</p>
+    </div>
+
+    <!-- Stats badges -->
+    <div class="stats-row" aria-label="Sort statistics">
+        <div class="stat-card">
+            <span class="stat-value" id="stat-total">—</span>
+            <span class="stat-label">Files sorted</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-value text-teal" id="stat-genres">—</span>
+            <span class="stat-label">Genres used</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-value text-muted" id="stat-unclassified">—</span>
+            <span class="stat-label">Unclassified</span>
+        </div>
+        <div class="stat-card" id="stat-errors-card">
+            <span class="stat-value text-error" id="stat-errors">0</span>
+            <span class="stat-label">Errors</span>
+        </div>
+    </div>
+
+    <!-- Copy/move mode notice -->
+    <div class="copy-mode-notice copy" id="copy-mode-notice" role="status" aria-live="polite">
+        <span aria-hidden="true">📋</span>
+        <span id="copy-mode-text">Files were copied — originals preserved in their original location.</span>
+    </div>
+
+    <!-- Action buttons -->
+    <div class="action-row">
+        <button
+            type="button"
+            class="btn btn-primary"
+            id="undo-btn"
+            onclick="undoSort()"
+            aria-label="Undo the last sort and restore original file locations"
+        >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polyline points="1 4 1 10 7 10"/>
+                <path d="M3.51 15a9 9 0 1 0 .49-3.37"/>
+            </svg>
+            Undo Sort
+        </button>
+
+        <button
+            type="button"
+            class="btn btn-outline"
+            onclick="exportCSV()"
+            aria-label="Export track data as CSV file"
+        >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Export CSV
+        </button>
+
+        <a href="/" class="btn btn-ghost" aria-label="Sort another folder">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <line x1="12" y1="5" x2="12" y2="19"/>
+                <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            Sort More
+        </a>
+    </div>
+
+    <hr class="divider">
+
+    <!-- Error list (collapsible — shown only if errors > 0) -->
+    <div class="error-section" id="error-section" hidden aria-label="Sort errors">
+        <details class="error-summary" id="error-details">
+            <summary>
+                <span id="error-summary-label">0 errors during sort</span>
+            </summary>
+            <div class="error-list" id="error-list" role="list">
+                <!-- Populated by JS -->
+            </div>
+        </details>
+    </div>
+
+    <!-- Empty state — shown if sessionStorage has no results -->
+    <div id="no-results-state" class="empty-state" hidden>
+        <span class="empty-state-icon" aria-hidden="true">🤔</span>
+        <h3>No results found</h3>
+        <p class="text-muted" style="font-size:0.85rem">
+            It looks like this page was opened directly.
+            <a href="/">Start from the beginning</a> to scan and sort a folder.
+        </p>
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        initResults();
+    });
+</script>
+{% endblock %}

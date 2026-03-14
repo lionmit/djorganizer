@@ -1,72 +1,60 @@
 #!/bin/bash
-# ═══════════════════════════════════════════════════════════
-#  DJOrganizer — Double-click to run
-#  Auto-sorts your DJ music library into genre folders.
-#  https://github.com/lionmit/djorganizer
-# ═══════════════════════════════════════════════════════════
+# DJOrganizer v19 — Double-click to launch
+# Automatically sets up Python environment and opens the app
 
-# Move to the folder this script lives in
 cd "$(dirname "$0")"
 
-clear
-echo ""
-echo "  ╔══════════════════════════════════════════════════╗"
-echo "  ║         DJOrganizer — Music Library Sorter       ║"
-echo "  ╚══════════════════════════════════════════════════╝"
+echo "🎵 DJOrganizer v19 — Starting..."
 echo ""
 
-# Check for Python 3
-if command -v python3 &>/dev/null; then
-    PYTHON=python3
-elif command -v python &>/dev/null; then
-    # Check if 'python' is actually Python 3
-    PY_VERSION=$(python --version 2>&1 | grep -oE '[0-9]+' | head -1)
-    if [ "$PY_VERSION" = "3" ]; then
-        PYTHON=python
-    else
-        echo "  Python 3 is required but not installed."
-        echo ""
-        echo "  To install:"
-        echo "    1. Go to https://python.org/downloads"
-        echo "    2. Download Python 3"
-        echo "    3. Install it"
-        echo "    4. Double-click this file again"
-        echo ""
-        read -p "  Press Enter to close..."
-        exit 1
-    fi
-else
-    echo "  Python 3 is required but not installed."
+# Check Python 3
+if ! command -v python3 &> /dev/null; then
+    echo "❌ Python 3 is required but not installed."
+    echo "   Download it from: https://www.python.org/downloads/"
     echo ""
-    echo "  To install:"
-    echo "    1. Go to https://python.org/downloads"
-    echo "    2. Download Python 3"
-    echo "    3. Install it"
-    echo "    4. Double-click this file again"
-    echo ""
-    read -p "  Press Enter to close..."
+    echo "Press Enter to close..."
+    read
     exit 1
 fi
 
-# Auto-install mutagen for better track classification (one time only)
-if ! $PYTHON -c "import mutagen" 2>/dev/null; then
-    echo "  Setting up for first use... (one time only)"
-    echo ""
-    $PYTHON -m pip install --user mutagen --quiet 2>/dev/null
-    if $PYTHON -c "import mutagen" 2>/dev/null; then
-        echo "  ✓ Metadata reading enabled — more tracks will be classified"
-    else
-        echo "  (Metadata reading unavailable — tool works fine without it)"
-    fi
-    echo ""
+echo "✅ Python 3 found: $(python3 --version)"
+
+# Create venv if needed
+if [ ! -d ".venv" ]; then
+    echo "📦 Setting up environment (first run only)..."
+    python3 -m venv .venv
 fi
 
-# Run the sorter in interactive mode
-$PYTHON sort_main_crate.py
+# Activate venv
+source .venv/bin/activate
+
+# Install dependencies
+echo "📦 Checking dependencies..."
+pip install -r requirements.txt --quiet 2>/dev/null
 
 echo ""
-echo "  ─────────────────────────────────────────────────"
-echo "  Done. You can close this window."
-echo "  ─────────────────────────────────────────────────"
+echo "🚀 Launching DJOrganizer..."
+echo "   Close this window to stop the server."
 echo ""
-read -p "  Press Enter to close..."
+
+# Start Flask in background, capture output to detect actual port
+python app.py 2>&1 &
+SERVER_PID=$!
+
+# Wait for server to print its port, then open browser
+for i in $(seq 1 20); do
+    sleep 0.5
+    # Check if server printed its URL
+    PORT=$(lsof -iTCP -sTCP:LISTEN -nP -p $SERVER_PID 2>/dev/null | grep -oE '127\.0\.0\.1:[0-9]+' | head -1 | cut -d: -f2)
+    if [ -n "$PORT" ]; then
+        echo "   Opening http://127.0.0.1:$PORT"
+        open "http://127.0.0.1:$PORT"
+        break
+    fi
+done
+
+# Wait for server process — closing Terminal kills it
+wait $SERVER_PID
+
+echo ""
+echo "DJOrganizer stopped."

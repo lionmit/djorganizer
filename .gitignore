@@ -1,41 +1,7 @@
-# Audio files — never commit music
-*.mp3
-*.flac
-*.wav
-*.aiff
-*.aif
-*.m4a
-*.ogg
-*.mp4
-*.m4v
-*.wma
-
-# User config (created on first run)
-djorganizer_config.txt
-
-# Music library folders
-DJ_MUSIC/
-PioneerDJ/
-GarageBand/
-Main Crate/
-Music from diskonkey/
-Audio Music Apps/
-
-# Personal data files
-*.xml
-*.xlsx
-*.csv
-*.txt
-*.docx
-*.backup
-*.db-wal
-*.db-shm
-
-# System
+.vercel
+.venv/
 __pycache__/
 *.pyc
-.DS_Store
-Thumbs.db
-desktop.ini
-$RECYCLE.BIN/
-.localized
+djorganizer_config.txt
+djorganizer_moves.json
+djorganizer_tags.csv
