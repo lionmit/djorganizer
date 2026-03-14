@@ -1,0 +1,1697 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DJOrganizer — Auto-Sort Your Music Library by Genre</title>
+  <meta name="description" content="DJOrganizer auto-sorts your DJ music library into genre folders using smart filename analysis. Built for Rekordbox. No code required.">
+  <meta name="theme-color" content="#0F172A">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Heebo:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --yellow: #FBBF24;
+      --navy: #0F172A;
+      --navy-light: #1E293B;
+      --teal: #0EA5E9;
+      --white: #F8FAFC;
+      --gray: #94A3B8;
+      --gray-dark: #64748B;
+      --font-main: 'Space Grotesk', sans-serif;
+      --font-heb: 'Heebo', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-main);
+      background: var(--navy);
+      color: var(--white);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ── Utility ── */
+    .container {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    section { padding: 80px 0; }
+
+    @media (max-width: 640px) {
+      section { padding: 56px 0; }
+    }
+
+    a { color: var(--teal); text-decoration: none; transition: color 0.2s; }
+    a:hover { color: var(--yellow); }
+
+    /* ── Nav ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(251, 191, 36, 0.12);
+      padding: 16px 0;
+    }
+
+    nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-logo {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--yellow);
+      letter-spacing: -0.02em;
+    }
+
+    .nav-logo span { color: var(--white); }
+
+    .nav-links { display: flex; gap: 28px; align-items: center; }
+    .nav-links a { color: var(--gray); font-size: 0.9rem; font-weight: 500; }
+    .nav-links a:hover { color: var(--white); }
+
+    .nav-cta {
+      background: var(--yellow);
+      color: var(--navy) !important;
+      padding: 8px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .nav-cta:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(251, 191, 36, 0.3);
+      color: var(--navy) !important;
+    }
+
+    @media (max-width: 640px) {
+      .nav-links a:not(.nav-cta) { display: none; }
+    }
+
+    /* ── Hero ── */
+    .hero {
+      padding-top: 140px;
+      padding-bottom: 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -120px; right: -200px;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(14, 165, 233, 0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -80px; left: -150px;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(251, 191, 36, 0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero .container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+
+    @media (max-width: 860px) {
+      .hero .container {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(251, 191, 36, 0.1);
+      border: 1px solid rgba(251, 191, 36, 0.25);
+      padding: 6px 16px;
+      border-radius: 100px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--yellow);
+      margin-bottom: 24px;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.4rem, 5vw, 3.6rem);
+      font-weight: 700;
+      line-height: 1.12;
+      letter-spacing: -0.03em;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 .highlight {
+      color: var(--yellow);
+      position: relative;
+    }
+
+    .hero p.subtitle {
+      font-size: 1.15rem;
+      color: var(--gray);
+      max-width: 480px;
+      margin-bottom: 36px;
+      line-height: 1.7;
+    }
+
+    @media (max-width: 860px) {
+      .hero p.subtitle { margin-left: auto; margin-right: auto; }
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 860px) {
+      .hero-buttons { justify-content: center; }
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--yellow);
+      color: var(--navy);
+      padding: 14px 32px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 1rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(251, 191, 36, 0.25);
+      color: var(--navy);
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      color: var(--white);
+      padding: 14px 32px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 1rem;
+      border: 1px solid rgba(255,255,255,0.15);
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--teal);
+      background: rgba(14, 165, 233, 0.08);
+      color: var(--white);
+    }
+
+    /* Hero Visual */
+    .hero-visual {
+      position: relative;
+    }
+
+    .vinyl-container {
+      position: relative;
+      width: 100%;
+      max-width: 420px;
+      margin: 0 auto;
+      aspect-ratio: 1;
+    }
+
+    .vinyl-disc {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: conic-gradient(
+        from 0deg,
+        #1a1a2e 0deg,
+        #16162a 30deg,
+        #1a1a2e 60deg,
+        #16162a 90deg,
+        #1a1a2e 120deg,
+        #16162a 150deg,
+        #1a1a2e 180deg,
+        #16162a 210deg,
+        #1a1a2e 240deg,
+        #16162a 270deg,
+        #1a1a2e 300deg,
+        #16162a 330deg,
+        #1a1a2e 360deg
+      );
+      box-shadow:
+        0 0 0 3px rgba(251, 191, 36, 0.15),
+        0 0 60px rgba(14, 165, 233, 0.12),
+        inset 0 0 80px rgba(0,0,0,0.4);
+      animation: spin 20s linear infinite;
+      position: relative;
+    }
+
+    .vinyl-disc::before {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 35%;
+      height: 35%;
+      border-radius: 50%;
+      background: radial-gradient(circle,
+        var(--yellow) 0%,
+        #E5A800 25%,
+        var(--navy-light) 26%,
+        var(--navy-light) 100%
+      );
+      border: 2px solid rgba(251, 191, 36, 0.3);
+    }
+
+    .vinyl-disc::after {
+      content: 'DJ';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--navy);
+      letter-spacing: 0.05em;
+    }
+
+    /* Grooves */
+    .vinyl-groove {
+      position: absolute;
+      top: 50%; left: 50%;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.03);
+      transform: translate(-50%, -50%);
+    }
+
+    .vinyl-groove:nth-child(1) { width: 92%; height: 92%; }
+    .vinyl-groove:nth-child(2) { width: 82%; height: 82%; }
+    .vinyl-groove:nth-child(3) { width: 72%; height: 72%; }
+    .vinyl-groove:nth-child(4) { width: 62%; height: 62%; }
+    .vinyl-groove:nth-child(5) { width: 52%; height: 52%; }
+    .vinyl-groove:nth-child(6) { width: 42%; height: 42%; }
+
+    /* Floating genre tags */
+    .genre-float {
+      position: absolute;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+      animation: float 6s ease-in-out infinite;
+      z-index: 2;
+    }
+
+    .genre-float:nth-child(8)  { top: 5%;  left: 0%;   background: rgba(251,191,36,0.15); color: var(--yellow); animation-delay: 0s; }
+    .genre-float:nth-child(9)  { top: 15%; right: -5%;  background: rgba(14,165,233,0.15); color: var(--teal); animation-delay: 1s; }
+    .genre-float:nth-child(10) { bottom: 20%; left: -8%; background: rgba(251,191,36,0.15); color: var(--yellow); animation-delay: 2s; }
+    .genre-float:nth-child(11) { bottom: 5%;  right: 0%;  background: rgba(14,165,233,0.15); color: var(--teal); animation-delay: 3s; }
+    .genre-float:nth-child(12) { top: 40%;   left: -12%; background: rgba(255,255,255,0.08); color: var(--gray); animation-delay: 4s; }
+    .genre-float:nth-child(13) { top: 35%;   right: -10%;background: rgba(255,255,255,0.08); color: var(--gray); animation-delay: 5s; }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    @media (max-width: 860px) {
+      .vinyl-container { max-width: 300px; }
+      .genre-float { display: none; }
+    }
+
+    /* ── Stats Bar ── */
+    .stats-bar {
+      background: var(--navy-light);
+      border-top: 1px solid rgba(251, 191, 36, 0.08);
+      border-bottom: 1px solid rgba(251, 191, 36, 0.08);
+      padding: 40px 0;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 32px;
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: clamp(1.8rem, 3vw, 2.4rem);
+      font-weight: 700;
+      color: var(--yellow);
+      line-height: 1.2;
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--gray);
+      margin-top: 4px;
+    }
+
+    @media (max-width: 640px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 24px; }
+    }
+
+    /* ── Section headers ── */
+    .section-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--teal);
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+
+    .section-subtitle {
+      font-size: 1.05rem;
+      color: var(--gray);
+      max-width: 560px;
+      line-height: 1.7;
+    }
+
+    .section-header { margin-bottom: 56px; }
+    .section-header.center { text-align: center; }
+    .section-header.center .section-subtitle { margin: 0 auto; }
+
+    /* ── How It Works ── */
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+    }
+
+    .step-card {
+      background: var(--navy-light);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px;
+      padding: 36px 28px;
+      position: relative;
+      transition: border-color 0.3s, transform 0.3s;
+    }
+
+    .step-card:hover {
+      border-color: rgba(251, 191, 36, 0.2);
+      transform: translateY(-4px);
+    }
+
+    .step-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      background: rgba(251, 191, 36, 0.1);
+      color: var(--yellow);
+      font-weight: 700;
+      font-size: 1.1rem;
+      margin-bottom: 20px;
+    }
+
+    .step-card h3 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .step-card p {
+      color: var(--gray);
+      font-size: 0.95rem;
+      line-height: 1.65;
+    }
+
+    .step-icon {
+      font-size: 1.6rem;
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    @media (max-width: 768px) {
+      .steps-grid { grid-template-columns: 1fr; max-width: 480px; margin: 0 auto; }
+    }
+
+    /* ── Genre Showcase ── */
+    .genres-section { background: var(--navy-light); }
+
+    .genres-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+    }
+
+    .genre-card {
+      background: var(--navy);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transition: border-color 0.3s, transform 0.2s;
+    }
+
+    .genre-card:hover {
+      border-color: rgba(14, 165, 233, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .genre-icon {
+      width: 44px; height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+
+    .genre-icon.yellow { background: rgba(251,191,36,0.12); }
+    .genre-icon.teal { background: rgba(14,165,233,0.12); }
+    .genre-icon.white { background: rgba(255,255,255,0.06); }
+
+    .genre-name {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .genre-sub {
+      font-size: 0.78rem;
+      color: var(--gray-dark);
+      margin-top: 2px;
+    }
+
+    /* ── Progress ── */
+    .progress-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+
+    @media (max-width: 768px) {
+      .progress-content { grid-template-columns: 1fr; }
+    }
+
+    .progress-bar-wrap {
+      margin-bottom: 32px;
+    }
+
+    .progress-bar-label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+    }
+
+    .progress-bar-label span:last-child { color: var(--yellow); font-weight: 600; }
+
+    .progress-bar-track {
+      height: 12px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 100px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      border-radius: 100px;
+      background: linear-gradient(90deg, var(--teal), var(--yellow));
+      transition: width 1.5s ease;
+    }
+
+    .progress-detail {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      margin-bottom: 20px;
+    }
+
+    .progress-detail-icon {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      background: rgba(14, 165, 233, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: var(--teal);
+      font-size: 0.9rem;
+    }
+
+    .progress-detail h4 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .progress-detail p {
+      font-size: 0.85rem;
+      color: var(--gray);
+    }
+
+    /* Terminal Preview */
+    .terminal {
+      background: #0c0c14;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      overflow: hidden;
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      font-size: 0.82rem;
+      line-height: 1.7;
+    }
+
+    .terminal-bar {
+      background: rgba(255,255,255,0.04);
+      padding: 10px 16px;
+      display: flex;
+      gap: 7px;
+    }
+
+    .terminal-dot {
+      width: 11px; height: 11px;
+      border-radius: 50%;
+    }
+
+    .terminal-dot:nth-child(1) { background: #FF5F56; }
+    .terminal-dot:nth-child(2) { background: #FFBD2E; }
+    .terminal-dot:nth-child(3) { background: #27C93F; }
+
+    .terminal-body {
+      padding: 20px;
+      overflow-x: auto;
+    }
+
+    .terminal-body .cmd { color: var(--teal); }
+    .terminal-body .out { color: var(--gray); }
+    .terminal-body .ok { color: #27C93F; }
+    .terminal-body .yellow { color: var(--yellow); }
+    .terminal-body .dim { color: var(--gray-dark); }
+
+    /* ── Built With ── */
+    .built-section { background: var(--navy-light); }
+
+    .built-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      align-items: center;
+    }
+
+    @media (max-width: 768px) {
+      .built-grid { grid-template-columns: 1fr; }
+    }
+
+    .built-quote {
+      font-size: 1.25rem;
+      line-height: 1.7;
+      font-style: italic;
+      color: var(--gray);
+      border-left: 3px solid var(--yellow);
+      padding-left: 24px;
+      margin-bottom: 20px;
+    }
+
+    .built-attribution {
+      font-size: 0.9rem;
+      color: var(--gray-dark);
+    }
+
+    .built-attribution strong { color: var(--white); font-weight: 600; }
+
+    .tech-stack {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .tech-tag {
+      background: var(--navy);
+      border: 1px solid rgba(255,255,255,0.08);
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ── CTA ── */
+    .cta-section {
+      text-align: center;
+      padding: 100px 0;
+      position: relative;
+    }
+
+    .cta-section::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(251,191,36,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .cta-section h2 {
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+
+    .cta-section p {
+      color: var(--gray);
+      font-size: 1.1rem;
+      margin-bottom: 40px;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .cta-buttons {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding: 40px 0;
+      text-align: center;
+    }
+
+    footer p {
+      color: var(--gray-dark);
+      font-size: 0.85rem;
+    }
+
+    footer a { color: var(--gray); }
+    footer a:hover { color: var(--yellow); }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+
+    /* ── Setup Guide ── */
+    .setup-section { background: var(--navy); }
+
+    .setup-steps {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    .setup-step {
+      display: grid;
+      grid-template-columns: 56px 1fr;
+      gap: 20px;
+      padding: 32px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      position: relative;
+    }
+
+    .setup-step:last-child { border-bottom: none; }
+
+    .setup-step-num {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      background: rgba(251, 191, 36, 0.12);
+      color: var(--yellow);
+      font-weight: 700;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .setup-step h3 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .setup-step p {
+      color: var(--gray);
+      font-size: 0.95rem;
+      line-height: 1.7;
+      margin-bottom: 12px;
+    }
+
+    .setup-code {
+      background: #0c0c14;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      font-size: 0.82rem;
+      color: var(--teal);
+      overflow-x: auto;
+      position: relative;
+    }
+
+    .setup-tip {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      background: rgba(14, 165, 233, 0.06);
+      border: 1px solid rgba(14, 165, 233, 0.15);
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin-top: 12px;
+      font-size: 0.88rem;
+      color: var(--gray);
+      line-height: 1.6;
+    }
+
+    .setup-tip-icon { flex-shrink: 0; font-size: 1.1rem; }
+
+    details summary::-webkit-details-marker { display: none; }
+    details summary::marker { display: none; content: ''; }
+    details summary { list-style: none; }
+    details summary::before { content: '+ '; font-weight: 700; }
+    details[open] summary::before { content: '- '; }
+
+    /* ── About / Contact ── */
+    .about-section { background: var(--navy-light); }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: start;
+    }
+
+    @media (max-width: 768px) {
+      .about-grid { grid-template-columns: 1fr; gap: 40px; }
+    }
+
+    .about-text p {
+      color: var(--gray);
+      font-size: 1rem;
+      line-height: 1.8;
+      margin-bottom: 16px;
+    }
+
+    .about-text strong { color: var(--white); }
+
+    .about-links {
+      display: flex;
+      gap: 16px;
+      margin-top: 24px;
+      flex-wrap: wrap;
+    }
+
+    .about-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--navy);
+      border: 1px solid rgba(255,255,255,0.08);
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--white);
+      transition: border-color 0.2s;
+    }
+
+    .about-link:hover { border-color: var(--yellow); color: var(--white); }
+
+    .contact-form {
+      background: var(--navy);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 36px 28px;
+    }
+
+    .contact-form h3 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .contact-form > p {
+      color: var(--gray);
+      font-size: 0.9rem;
+      margin-bottom: 24px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--gray);
+      margin-bottom: 6px;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      background: var(--navy-light);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      padding: 12px 16px;
+      color: var(--white);
+      font-family: var(--font-main);
+      font-size: 0.92rem;
+      transition: border-color 0.2s;
+      outline: none;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      border-color: var(--teal);
+    }
+
+    .form-group textarea { min-height: 100px; resize: vertical; }
+
+    .form-group select option { background: var(--navy); }
+
+    .form-submit {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--yellow);
+      color: var(--navy);
+      padding: 14px 32px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 1rem;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      font-family: var(--font-main);
+      width: 100%;
+      justify-content: center;
+    }
+
+    .form-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(251, 191, 36, 0.25);
+    }
+
+    .form-success {
+      display: none;
+      text-align: center;
+      padding: 32px 20px;
+    }
+
+    .form-success.show { display: block; }
+    .form-success .check { font-size: 2.5rem; margin-bottom: 12px; }
+    .form-success h4 { font-size: 1.1rem; margin-bottom: 8px; }
+    .form-success p { color: var(--gray); font-size: 0.9rem; }
+
+    /* ── About photo ── */
+    .about-photo {
+      width: 100%;
+      max-width: 360px;
+      border-radius: 16px;
+      border: 2px solid rgba(251, 191, 36, 0.2);
+      margin-bottom: 24px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+
+    /* ── Social links upgraded ── */
+    .about-links {
+      display: flex;
+      gap: 10px;
+      margin-top: 24px;
+      flex-wrap: wrap;
+    }
+
+    .about-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.08));
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--white);
+      transition: all 0.3s ease;
+    }
+
+    .about-link:hover {
+      border-color: var(--yellow);
+      color: var(--white);
+      background: rgba(251,191,36,0.08);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(251,191,36,0.15);
+    }
+
+    /* ── Mixcloud embed wrapper ── */
+    .mixcloud-wrap {
+      margin-top: 24px;
+      margin-bottom: 20px;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(0,0,0,0.2);
+    }
+
+    .mixcloud-wrap iframe { display: block; }
+
+    /* ── Animations ── */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Stagger children */
+    .fade-in:nth-child(2) { transition-delay: 0.1s; }
+    .fade-in:nth-child(3) { transition-delay: 0.2s; }
+    .fade-in:nth-child(4) { transition-delay: 0.3s; }
+    .fade-in:nth-child(5) { transition-delay: 0.15s; }
+    .fade-in:nth-child(6) { transition-delay: 0.25s; }
+
+    /* Slide from left */
+    .slide-left {
+      opacity: 0;
+      transform: translateX(-40px);
+      transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .slide-left.visible { opacity: 1; transform: translateX(0); }
+
+    /* Slide from right */
+    .slide-right {
+      opacity: 0;
+      transform: translateX(40px);
+      transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .slide-right.visible { opacity: 1; transform: translateX(0); }
+
+    /* Scale pop */
+    .scale-in {
+      opacity: 0;
+      transform: scale(0.9);
+      transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .scale-in.visible { opacity: 1; transform: scale(1); }
+
+    /* Glow pulse on hero badge */
+    @keyframes glow-pulse {
+      0%, 100% { box-shadow: 0 0 8px rgba(251,191,36,0.15); }
+      50% { box-shadow: 0 0 20px rgba(251,191,36,0.3); }
+    }
+    .hero-badge { animation: glow-pulse 3s ease-in-out infinite; }
+
+    /* Number count-up glow */
+    @keyframes number-glow {
+      0% { text-shadow: none; }
+      100% { text-shadow: 0 0 20px rgba(251,191,36,0.4); }
+    }
+    .stat-number.visible { animation: number-glow 0.6s ease forwards; }
+
+    /* Hover lift for all cards */
+    .genre-card, .step-card, .tech-tag {
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.3s, box-shadow 0.3s;
+    }
+    .genre-card:hover, .step-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.3);
+    }
+    .tech-tag:hover {
+      transform: translateY(-2px);
+      border-color: rgba(251,191,36,0.3);
+    }
+
+    /* Vinyl disc hover speed-up */
+    .vinyl-container:hover .vinyl-disc { animation-duration: 4s; }
+
+    /* Smooth scroll anchor offset */
+    :target { scroll-margin-top: 80px; }
+  </style>
+</head>
+<body>
+
+  <!-- Nav -->
+  <nav>
+    <div class="container">
+      <div class="nav-logo"><span>DJ</span>Organizer</div>
+      <div class="nav-links">
+        <a href="#how-it-works">How It Works</a>
+        <a href="#setup">Setup</a>
+        <a href="#genres">Genres</a>
+        <a href="#contact">Contact</a>
+        <a href="https://github.com/lionmit/djorganizer" target="_blank" rel="noopener" class="nav-cta">Get It Free</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-text">
+        <div class="hero-badge">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Open Source &middot; Free Forever
+        </div>
+        <h1>
+          Your music library,<br>
+          <span class="highlight">auto-sorted.</span>
+        </h1>
+        <p class="subtitle">
+          DJOrganizer scans your track filenames and sorts them into genre folders automatically. No audio analysis, no API keys, no code. Just run it and play.
+        </p>
+        <div class="hero-buttons">
+          <a href="https://github.com/lionmit/djorganizer" target="_blank" rel="noopener" class="btn-primary">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+            Download on GitHub
+          </a>
+          <a href="#how-it-works" class="btn-secondary">See How It Works</a>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="vinyl-container">
+          <div class="vinyl-disc">
+            <div class="vinyl-groove"></div>
+            <div class="vinyl-groove"></div>
+            <div class="vinyl-groove"></div>
+            <div class="vinyl-groove"></div>
+            <div class="vinyl-groove"></div>
+            <div class="vinyl-groove"></div>
+          </div>
+          <div class="genre-float">Hip-Hop</div>
+          <div class="genre-float">House</div>
+          <div class="genre-float">Latin</div>
+          <div class="genre-float">Israeli</div>
+          <div class="genre-float">Electronic</div>
+          <div class="genre-float">Classics</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats Bar -->
+  <div class="stats-bar">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="fade-in">
+          <div class="stat-number">6,374+</div>
+          <div class="stat-label">Tracks Sorted</div>
+        </div>
+        <div class="fade-in">
+          <div class="stat-number">11</div>
+          <div class="stat-label">Genre Folders</div>
+        </div>
+        <div class="fade-in">
+          <div class="stat-number">83.6%</div>
+          <div class="stat-label">Auto-Classified</div>
+        </div>
+        <div class="fade-in">
+          <div class="stat-number">12</div>
+          <div class="stat-label">Versions Refined</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- How It Works -->
+  <section id="how-it-works">
+    <div class="container">
+      <div class="section-header center">
+        <div class="section-label">How It Works</div>
+        <h2 class="section-title">Three steps. No code.</h2>
+        <p class="section-subtitle">
+          DJOrganizer reads your track filenames, matches genre keywords, and moves files into organized folders. That's it.
+        </p>
+      </div>
+      <div class="steps-grid">
+        <div class="step-card fade-in">
+          <span class="step-icon">&#128269;</span>
+          <div class="step-number">1</div>
+          <h3>Preview Mode</h3>
+          <p>Run the script in preview mode first. It scans all your tracks and shows exactly what would move where &mdash; without touching a single file. Zero risk.</p>
+        </div>
+        <div class="step-card fade-in">
+          <span class="step-icon">&#128194;</span>
+          <div class="step-number">2</div>
+          <h3>Execute Sort</h3>
+          <p>Happy with the preview? Switch to execute mode. DJOrganizer creates genre folders and moves your tracks in seconds. Unmatched files go to INBOX for manual review.</p>
+        </div>
+        <div class="step-card fade-in">
+          <span class="step-icon">&#127911;</span>
+          <div class="step-number">3</div>
+          <h3>Open Rekordbox</h3>
+          <p>Launch Rekordbox 7 and use Auto Relocate. It finds all your moved tracks automatically. Your playlists, cue points, and loops stay intact.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Setup Guide -->
+  <section id="setup" class="setup-section">
+    <div class="container">
+      <div class="section-header center">
+        <div class="section-label">Setup Guide</div>
+        <h2 class="section-title">Double-click. Point to your music. Done.</h2>
+        <p class="section-subtitle">
+          No code to edit. No config files. It asks you where your music is.
+        </p>
+      </div>
+
+      <div class="setup-steps">
+        <div class="setup-step fade-in">
+          <div class="setup-step-num">1</div>
+          <div>
+            <h3>Download</h3>
+            <p>Grab the <strong>DJOrganizer.dmg</strong> from the <a href="https://github.com/lionmit/djorganizer/releases" target="_blank" rel="noopener">Releases page</a> on GitHub. Open the DMG and drag the folder to your Desktop. No account needed, no installer, no admin password.</p>
+            <div class="setup-tip" style="margin-top: 14px;">
+              <span class="setup-tip-icon">&#128161;</span>
+              <span><strong>Need Python?</strong> If you don't have Python 3 installed, download it free from <a href="https://python.org/downloads" target="_blank" rel="noopener">python.org/downloads</a>. Install it, then continue.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="setup-step fade-in">
+          <div class="setup-step-num">2</div>
+          <div>
+            <h3>Double-click &amp; point to your music</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+              <div style="background: #0c0c14; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 16px;">
+                <div style="color: var(--yellow); font-weight: 600; font-size: 0.85rem; margin-bottom: 8px;">Mac</div>
+                <div style="color: var(--gray); font-size: 0.88rem; line-height: 1.6;">Double-click <strong style="color: var(--teal);">DJOrganizer.command</strong><br><span style="font-size: 0.78rem; color: #64748B;">First time? Right-click &rarr; Open</span></div>
+              </div>
+              <div style="background: #0c0c14; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 16px;">
+                <div style="color: var(--yellow); font-weight: 600; font-size: 0.85rem; margin-bottom: 8px;">Windows</div>
+                <div style="color: var(--gray); font-size: 0.88rem; line-height: 1.6;">Open cmd &rarr; <strong style="color: var(--teal);">python sort_main_crate.py</strong></div>
+              </div>
+            </div>
+            <p>It asks you two things: <strong>where your unsorted music is</strong> and <strong>where you want the genre folders</strong>. You can drag folders from Finder/Explorer right into the window. Works with your hard drive, a USB stick, an external SSD &mdash; anything.</p>
+            <p style="margin-top: 12px;">You'll see a preview of where every track will go. Nothing moves until you type <strong style="color: var(--teal);">y</strong> to confirm. Your settings are saved so next time it just runs.</p>
+          </div>
+        </div>
+
+        <div class="setup-step fade-in">
+          <div class="setup-step-num">3</div>
+          <div>
+            <h3>Reconnect in Rekordbox</h3>
+            <p>Open Rekordbox and click: <strong>File &rarr; Library &rarr; Relocate &rarr; Auto Relocate</strong>. Done. All your cue points, loops, and playlists stay exactly where they were.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Genres -->
+  <section id="genres" class="genres-section">
+    <div class="container">
+      <div class="section-header center">
+        <div class="section-label">Genre Library</div>
+        <h2 class="section-title">11 folders, one command.</h2>
+        <p class="section-subtitle">
+          Every genre folder is powered by a curated keyword list &mdash; 1,500+ artist names, labels, style tags, and language markers. Continuously refined across 17 versions.
+        </p>
+      </div>
+      <div class="genres-grid">
+        <div class="genre-card fade-in">
+          <div class="genre-icon teal">&#127908;</div>
+          <div>
+            <div class="genre-name">Hip-Hop & R&B</div>
+            <div class="genre-sub">Rap, trap, grime, drill</div>
+          </div>
+        </div>
+        <div class="genre-card fade-in">
+          <div class="genre-icon yellow">&#127968;</div>
+          <div>
+            <div class="genre-name">House</div>
+            <div class="genre-sub">Deep, tech, disco, dance</div>
+          </div>
+        </div>
+        <div class="genre-card fade-in">
+          <div class="genre-icon teal">&#9889;</div>
+          <div>
+            <div class="genre-name">Techno</div>
+            <div class="genre-sub">Hardstyle, hardcore, industrial</div>
+          </div>
+        </div>
+        <div class="genre-card fade-in">
+          <div class="genre-icon yellow">&#127752;</div>
+          <div>
+            <div class="genre-name">Trance & Psy</div>
+            <div class="genre-sub">Psytrance, goa, uplifting</div>
+          </div>
+        </div>
+        <div class="genre-card fade-in">
+          <div class="genre-icon teal">&#128165;</div>
+          <div>
+            <div class="genre-name">Bass & DnB</div>
+            <div class="genre-sub">Drum & bass, dubstep, riddim</div>
+          </div>
+        </div>
+        <div class="genre-card fade-in">
+          <div class="genre-icon yellow">&#9889;</div>
+          <div>
+            <div class="genre-name">Electronic</div>
+            <div class="genre-sub">Ambient, synth, downtempo</div>
+          </div>
+        </div>
+        <div class="genre-card fade-in">
+          <div class="genre-icon teal">&#127925;</div>
+          <div>
+            <div class="genre-name">Pop</div>
+            <div class="genre-sub">Top 40, dance pop</div>
+          </div>
+        </div>
+        <div class="genre-card fade-in">
+          <div class="genre-icon yellow">&#127928;</div>
+          <div>
+            <div class="genre-name">Rock</div>
+            <div class="genre-sub">Classic, indie, alternative</div>
+          </div>
+        </div>
+        <div class="genre-card fade-in">
+          <div class="genre-icon teal">&#128131;</div>
+          <div>
+            <div class="genre-name">Latin</div>
+            <div class="genre-sub">Reggaeton, salsa, bachata</div>
+          </div>
+        </div>
+        <div class="genre-card fade-in">
+          <div class="genre-icon yellow">&#127925;</div>
+          <div>
+            <div class="genre-name">Afrobeats</div>
+            <div class="genre-sub">Amapiano, dancehall, soca</div>
+          </div>
+        </div>
+        <div class="genre-card fade-in">
+          <div class="genre-icon teal">&#127758;</div>
+          <div>
+            <div class="genre-name">World</div>
+            <div class="genre-sub">Reggae, Arabic, ecstatic</div>
+          </div>
+        </div>
+        <div class="genre-card fade-in">
+          <div class="genre-icon yellow">&#127926;</div>
+          <div>
+            <div class="genre-name">Classics</div>
+            <div class="genre-sub">Timeless hits, old school</div>
+          </div>
+        </div>
+        <div class="genre-card fade-in">
+          <div class="genre-icon teal">&#127470;&#127473;</div>
+          <div>
+            <div class="genre-name">Israeli / Hebrew</div>
+            <div class="genre-sub">Mizrahi, pop, classics</div>
+          </div>
+        </div>
+        <div class="genre-card fade-in">
+          <div class="genre-icon white">&#128295;</div>
+          <div>
+            <div class="genre-name">Tools / FX</div>
+            <div class="genre-sub">Transitions, samples, drops</div>
+          </div>
+        </div>
+        <div class="genre-card fade-in">
+          <div class="genre-icon white">&#128260;</div>
+          <div>
+            <div class="genre-name">Remixes</div>
+            <div class="genre-sub">Bootlegs, edits, mashups</div>
+          </div>
+        </div>
+        <div class="genre-card fade-in">
+          <div class="genre-icon white">&#128229;</div>
+          <div>
+            <div class="genre-name">INBOX</div>
+            <div class="genre-sub">Unmatched &mdash; review manually</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Progress / Terminal -->
+  <section id="progress">
+    <div class="container">
+      <div class="progress-content">
+        <div>
+          <div class="section-header">
+            <div class="section-label">Accuracy</div>
+            <h2 class="section-title">Getting smarter with every version.</h2>
+            <p class="section-subtitle">
+              Started at 73.7% auto-classification. Now at 83.6% after 12 iterative refinements &mdash; each version adding new keywords, fixing edge cases, and reducing the INBOX pile.
+            </p>
+          </div>
+          <div class="progress-bar-wrap fade-in">
+            <div class="progress-bar-label">
+              <span>Classification Rate</span>
+              <span>83.6%</span>
+            </div>
+            <div class="progress-bar-track">
+              <div class="progress-bar-fill" style="width: 0%" data-target="83.6"></div>
+            </div>
+          </div>
+          <div class="progress-detail fade-in">
+            <div class="progress-detail-icon">&#9889;</div>
+            <div>
+              <h4>No audio fingerprinting needed</h4>
+              <p>Pure filename keyword matching &mdash; fast, private, works offline</p>
+            </div>
+          </div>
+          <div class="progress-detail fade-in">
+            <div class="progress-detail-icon">&#128274;</div>
+            <div>
+              <h4>Preview before you commit</h4>
+              <p>Dry run mode shows every move before any file is touched</p>
+            </div>
+          </div>
+          <div class="progress-detail fade-in">
+            <div class="progress-detail-icon">&#128260;</div>
+            <div>
+              <h4>Rekordbox auto-reconnects</h4>
+              <p>Auto Relocate in Rekordbox 7 finds your moved files instantly</p>
+            </div>
+          </div>
+        </div>
+        <div class="fade-in">
+          <div class="terminal">
+            <div class="terminal-bar">
+              <div class="terminal-dot"></div>
+              <div class="terminal-dot"></div>
+              <div class="terminal-dot"></div>
+            </div>
+            <div class="terminal-body">
+              <div><span class="cmd">$</span> <span class="dim">python dj_organizer.py --preview</span></div>
+              <br>
+              <div class="out">Scanning 6,374 tracks...</div>
+              <br>
+              <div class="ok">&#10003;</div> <span class="out">Israeli/Hebrew:</span> <span class="yellow">847 tracks</span></div>
+              <div><span class="ok">&#10003;</span> <span class="out">Hip-Hop:</span> <span class="yellow">612 tracks</span></div>
+              <div><span class="ok">&#10003;</span> <span class="out">House:</span> <span class="yellow">534 tracks</span></div>
+              <div><span class="ok">&#10003;</span> <span class="out">Electronic:</span> <span class="yellow">389 tracks</span></div>
+              <div><span class="ok">&#10003;</span> <span class="out">Pop:</span> <span class="yellow">356 tracks</span></div>
+              <div><span class="ok">&#10003;</span> <span class="out">Rock:</span> <span class="yellow">198 tracks</span></div>
+              <div><span class="ok">&#10003;</span> <span class="out">Latin:</span> <span class="yellow">167 tracks</span></div>
+              <div><span class="ok">&#10003;</span> <span class="out">+ 4 more genres</span></div>
+              <br>
+              <div><span class="out">INBOX (unmatched):</span> <span class="dim">619 tracks (16.4%)</span></div>
+              <br>
+              <div class="ok">Preview complete. No files moved.</div>
+              <div class="dim">Run with --execute to sort.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Built With -->
+  <section class="built-section">
+    <div class="container">
+      <div class="built-grid">
+        <div class="fade-in">
+          <div class="section-header">
+            <div class="section-label">Origin Story</div>
+            <h2 class="section-title">Built without writing a single line of code.</h2>
+          </div>
+          <blockquote class="built-quote">
+            "I'm a DJ, not a developer. I described what I needed to Claude Code, and it built the entire tool through conversation. Sixteen versions later, it sorts my whole library."
+          </blockquote>
+          <div class="built-attribution">
+            <strong>Lionel Mitelpunkt</strong> &mdash; DJ, entrepreneur, non-technical builder
+          </div>
+        </div>
+        <div class="fade-in">
+          <div class="section-label" style="margin-bottom: 20px;">Tech Stack</div>
+          <div class="tech-stack">
+            <div class="tech-tag">
+              <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke="#FBBF24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Python
+            </div>
+            <div class="tech-tag">
+              <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0022 16z" stroke="#0EA5E9" stroke-width="2"/></svg>
+              Claude Code
+            </div>
+            <div class="tech-tag">
+              <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="#94A3B8" stroke-width="2"/><path d="M12 6v6l4 2" stroke="#94A3B8" stroke-width="2" stroke-linecap="round"/></svg>
+              Rekordbox 7
+            </div>
+            <div class="tech-tag">
+              <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" stroke="#94A3B8" stroke-width="2"/><path d="M3 9h18M9 21V9" stroke="#94A3B8" stroke-width="2"/></svg>
+              Pioneer DDJ-FLX4
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Help Improve — Self-serve via GitHub Issues -->
+  <section id="contribute">
+    <div class="container">
+      <div class="section-header center">
+        <div class="section-label">Help Improve It</div>
+        <h2 class="section-title">Tracks in the wrong folder? Fix it yourself.</h2>
+        <p class="section-subtitle">
+          DJOrganizer is open source. Anyone can suggest changes directly on GitHub &mdash; no coding skills needed. Just open an issue.
+        </p>
+      </div>
+      <div class="steps-grid">
+        <div class="step-card fade-in">
+          <span class="step-icon">&#127911;</span>
+          <div class="step-number">&#43;</div>
+          <h3>Missing artist or genre?</h3>
+          <p>If a track keeps landing in INBOX, or you need a genre we don't have (Amapiano, Drill, Afro House...), open a <a href="https://github.com/lionmit/djorganizer/issues/new" target="_blank" rel="noopener">GitHub Issue</a>. Just write the artist name and the genre it should go to.</p>
+        </div>
+        <div class="step-card fade-in">
+          <span class="step-icon">&#128260;</span>
+          <div class="step-number">&#43;</div>
+          <h3>Wrong folder?</h3>
+          <p>Track sorted into Rock but it's clearly Electronic? <a href="https://github.com/lionmit/djorganizer/issues/new" target="_blank" rel="noopener">Report it</a> with the filename and the correct genre. Takes 30 seconds, helps every DJ using this tool.</p>
+        </div>
+        <div class="step-card fade-in">
+          <span class="step-icon">&#128187;</span>
+          <div class="step-number">&#43;</div>
+          <h3>Know some Python?</h3>
+          <p>The keyword lists are plain text inside <strong>sort_main_crate.py</strong>. Add artists, fix matches, create new genres &mdash; then submit a pull request. Community contributions make this tool smarter for everyone.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- The Story — Build Log as lead magnet -->
+  <section id="story" style="background: var(--navy); position: relative; overflow: hidden;">
+    <div class="container" style="position: relative; z-index: 1;">
+      <div class="section-header center">
+        <div class="section-label">The Story</div>
+        <h2 class="section-title">DJing is one of my flourishing practices. This tool keeps me in flow.</h2>
+      </div>
+      <div style="max-width: 640px; margin: 0 auto; text-align: center;">
+        <p style="color: var(--gray); font-size: 1.05rem; line-height: 1.8; margin-bottom: 20px;">
+          It started at <strong style="color: var(--white);">Midburn</strong> &mdash; the Israeli Burning Man. Nobody was playing fun music with lyrics. So I showed up with two phones and an analog mixer and just started mixing for people. No grand plan. Just a gap that needed filling and a desire to make people move.
+        </p>
+        <p style="color: var(--gray); font-size: 1.05rem; line-height: 1.8; margin-bottom: 20px;">
+          Today I play clubs, events, and always burn events. DJing became one of my core flourishing practices &mdash; a space where creativity, flow, and connection come together. But 6,374 tracks and years of chaos meant I spent more time <em>finding</em> tracks than <em>mixing</em> them.
+        </p>
+        <p style="color: var(--gray); font-size: 1.05rem; line-height: 1.8; margin-bottom: 20px;">
+          I'm not a developer. I described what I needed to <strong style="color: var(--white);">Claude Code</strong> in plain English. It wrote the Python. I tested, gave feedback, and we iterated &mdash; 12 versions later, my entire library sorts itself in seconds. The tool exists so I can stay in the music, not in the file system.
+        </p>
+        <p style="color: var(--white); font-size: 1.1rem; line-height: 1.8; margin-bottom: 36px; font-weight: 500;">
+          Every single session is documented. The whole journey &mdash; from zero to working product &mdash; is in the Build Log.
+        </p>
+        <a href="https://creative-gym-67.vercel.app/log.html" target="_blank" rel="noopener" class="btn-primary" style="font-size: 1.05rem; padding: 16px 36px;">
+          <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="2"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          Read the Build Log
+        </a>
+      </div>
+    </div>
+    <div style="position: absolute; top: -100px; right: -200px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(251,191,36,0.04) 0%, transparent 70%); pointer-events: none;"></div>
+  </section>
+
+  <!-- About & Contact -->
+  <section id="contact" class="about-section">
+    <div class="container">
+      <div class="about-grid">
+        <div class="fade-in">
+          <div class="section-header">
+            <div class="section-label">About</div>
+            <h2 class="section-title">Lionel Mitelpunkt</h2>
+          </div>
+          <div class="about-text">
+            <p>
+              DJ, chaplain, entrepreneur, and innovation facilitator based in Israel. I build products with AI without writing code &mdash; and I teach others how to do the same.
+            </p>
+            <p>
+              <strong>Want to learn how I did this?</strong> I offer 1-on-1 sessions where I walk you through building your own tools with Claude Code &mdash; no coding background needed. I also do online back-to-back DJ sessions.
+            </p>
+          </div>
+
+          <!-- Mixcloud Embed -->
+          <div style="margin-top: 28px; margin-bottom: 24px;">
+            <iframe width="100%" height="120" src="https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&feed=%2Flionelm2%2F" frameborder="0" style="border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);"></iframe>
+          </div>
+
+          <div class="about-links">
+            <a href="https://www.mixcloud.com/lionelm2/" target="_blank" rel="noopener" class="about-link">
+              <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M20.76 11.04A4.84 4.84 0 0016 7a4.83 4.83 0 00-4 2.12A4.83 4.83 0 008 7a4.84 4.84 0 00-4.76 4.04A3.5 3.5 0 004.5 18h15a3.5 3.5 0 001.26-6.96z"/></svg>
+              Mixcloud
+            </a>
+            <a href="https://soundcloud.com/lionmit" target="_blank" rel="noopener" class="about-link">
+              <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M1 18v-6m3 7V9m3 9V6m3 12V4m3 14v-8m3 8V8m3 10V2"/></svg>
+              SoundCloud
+            </a>
+            <a href="https://open.spotify.com/user/lionmit" target="_blank" rel="noopener" class="about-link">
+              <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.6 0 12 0zm5.5 17.3c-.2.3-.6.4-1 .2-2.7-1.6-6-2-10-1.1-.4.1-.7-.1-.8-.5-.1-.4.1-.7.5-.8 4.3-1 8.1-.6 11.1 1.2.3.2.4.7.2 1zm1.5-3.3c-.3.4-.8.5-1.2.3-3-1.9-7.7-2.4-11.3-1.3-.5.1-.9-.1-1.1-.6-.1-.5.1-.9.6-1.1 4.1-1.3 9.2-.7 12.6 1.5.4.2.5.8.4 1.2zm.1-3.4c-3.7-2.2-9.8-2.4-13.3-1.3-.5.2-1.1-.1-1.3-.6-.2-.5.1-1.1.6-1.3 4-1.2 10.7-1 14.9 1.5.5.3.6.9.4 1.4-.3.4-.9.6-1.3.3z"/></svg>
+              Spotify
+            </a>
+            <a href="https://www.instagram.com/lionmit/" target="_blank" rel="noopener" class="about-link">
+              <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor"/></svg>
+              Instagram
+            </a>
+            <a href="https://lionelmitelpunkt.com" target="_blank" rel="noopener" class="about-link">
+              <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" stroke="currentColor" stroke-width="2"/></svg>
+              Website
+            </a>
+          </div>
+        </div>
+
+        <div class="fade-in">
+          <div class="contact-form" id="contact-form-wrap">
+            <h3>Book a Session</h3>
+            <p>Learn to build with AI, or join me for an online back-to-back DJ set.</p>
+            <form action="https://formsubmit.co/lionmit@gmail.com" method="POST" id="contact-form">
+              <input type="hidden" name="_subject" value="DJOrganizer — New inquiry from product page">
+              <input type="hidden" name="_captcha" value="false">
+              <input type="hidden" name="_next" value="https://djorganizer.vercel.app/#contact">
+              <input type="text" name="_honey" style="display:none">
+              <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" placeholder="Your name" required>
+              </div>
+              <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" placeholder="you@example.com" required>
+              </div>
+              <div class="form-group">
+                <label for="topic">I'm interested in...</label>
+                <select id="topic" name="topic">
+                  <option value="AI Lessons">Learn to build with AI (1-on-1)</option>
+                  <option value="Back2Back DJ">Online back-to-back DJ session</option>
+                  <option value="DJOrganizer help">DJOrganizer setup help</option>
+                  <option value="Collaboration">Collaboration idea</option>
+                  <option value="Just saying hi">Just saying hi</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="message">Message</label>
+                <textarea id="message" name="message" placeholder="Tell me what you're looking for..." required></textarea>
+              </div>
+              <button type="submit" class="form-submit">Send Message</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="container">
+      <h2>Stop searching.<br>Start <span style="color: var(--yellow);">playing.</span></h2>
+      <p>Free, open source, and ready to organize your library in minutes.</p>
+      <div class="cta-buttons">
+        <a href="https://github.com/lionmit/djorganizer" target="_blank" rel="noopener" class="btn-primary">
+          <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          Download on GitHub
+        </a>
+        <a href="https://github.com/lionmit/djorganizer#readme" target="_blank" rel="noopener" class="btn-secondary">Read the Docs</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="footer-links">
+        <a href="https://github.com/lionmit/djorganizer" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://lionelmitelpunkt.com" target="_blank" rel="noopener">Lionel Mitelpunkt</a>
+      </div>
+      <p>DJOrganizer is open source. Built with Claude Code by a DJ who doesn't write code.</p>
+    </div>
+  </footer>
+
+  <!-- Intersection Observer for fade-in + progress bar animation -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            // Animate progress bar fill
+            var fill = entry.target.querySelector('.progress-bar-fill');
+            if (fill && fill.dataset.target) {
+              fill.style.width = fill.dataset.target + '%';
+            }
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.15 });
+
+      document.querySelectorAll('.fade-in').forEach(function(el) {
+        observer.observe(el);
+      });
+    });
+  </script>
+
+  <!-- Vercel Analytics -->
+  <script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)};</script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>
