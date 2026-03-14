@@ -27,37 +27,11 @@
             aria-label="Drop music folder here or press Enter to browse"
             aria-describedby="drop-zone-hint"
         >
-            <!-- Hidden directory picker -->
-            <input
-                type="file"
-                id="folder-input"
-                class="file-input-hidden"
-                webkitdirectory
-                multiple
-                aria-label="Choose music folder"
-                tabindex="-1"
-            >
-
             <span class="drop-icon" aria-hidden="true">🎵</span>
-            <p class="drop-title">Drop your music folder here</p>
+            <p class="drop-title">Paste your music folder path</p>
             <p class="drop-subtitle" id="drop-zone-hint">
                 Supports MP3, WAV, FLAC, AIFF, M4A, OGG
             </p>
-
-            <button
-                type="button"
-                class="btn btn-primary"
-                onclick="document.getElementById('folder-input').click()"
-                style="margin-bottom:0.25rem"
-            >
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                     stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
-                </svg>
-                Browse folder
-            </button>
-
-            <div class="drop-divider">or type/paste path</div>
 
             <div class="path-input-row">
                 <input
@@ -188,5 +162,17 @@
 <script>
     // Pass config to JS for default output path
     window.DJCONFIG = {{ config | tojson if config else '{}' }};
+
+    // Auto-scan if ?path= is in the URL (set by native folder picker on launch)
+    (function() {
+        const params = new URLSearchParams(window.location.search);
+        const prefill = params.get('path');
+        if (prefill) {
+            const input = document.getElementById('path-input');
+            if (input) input.value = prefill;
+            // Small delay to let page fully render, then auto-scan
+            setTimeout(function() { startScan(prefill); }, 300);
+        }
+    })();
 </script>
 {% endblock %}

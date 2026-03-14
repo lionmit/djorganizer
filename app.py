@@ -296,8 +296,54 @@ def find_free_port(start=5555, max_tries=10):
             continue
     return start
 
+def pick_folder_gui():
+    """Show a native OS folder picker. Returns path string or None."""
+    import sys
+    if sys.platform == "darwin":
+        # Use osascript for a native Finder dialog (no tkinter dependency)
+        import subprocess
+        result = subprocess.run(
+            ["osascript", "-e",
+             'tell application "Finder" to activate\n'
+             'set theFolder to choose folder with prompt "Select your music folder"\n'
+             'return POSIX path of theFolder'],
+            capture_output=True, text=True, timeout=120
+        )
+        if result.returncode == 0 and result.stdout.strip():
+            return result.stdout.strip()
+    else:
+        # Windows/Linux: use tkinter
+        try:
+            import tkinter as tk
+            from tkinter import filedialog
+            root = tk.Tk()
+            root.withdraw()
+            folder = filedialog.askdirectory(title="Select your music folder")
+            root.destroy()
+            if folder:
+                return folder
+        except Exception:
+            pass
+    return None
+
 if __name__ == "__main__":
+    import sys
+    import webbrowser
+
+    # Check for --no-picker flag or command-line path
+    folder_path = None
+    if len(sys.argv) > 1 and sys.argv[1] != "--no-picker":
+        folder_path = sys.argv[1]
+    elif "--no-picker" not in sys.argv:
+        folder_path = pick_folder_gui()
+
     app = create_app()
     port = find_free_port()
+    url = f"http://127.0.0.1:{port}"
+    if folder_path:
+        # Pre-fill the folder path so the welcome page can auto-scan
+        app.config["PREFILL_PATH"] = folder_path
+        url += f"?path={folder_path}"
     print(f"DJOrganizer v19 running at http://127.0.0.1:{port}")
+    webbrowser.open(url)
     app.run(host="127.0.0.1", port=port, debug=False)
