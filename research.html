@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DJOrganizer — How Pro DJs Organize Music (Research)</title>
+  <meta name="description" content="Research-backed guide on how professional DJs organize their music libraries — genre folders, energy levels, vibe tagging, and clean/explicit management.">
+  <meta name="theme-color" content="#0F172A">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Heebo:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --yellow: #FBBF24;
+      --navy: #0F172A;
+      --navy-light: #1E293B;
+      --teal: #0EA5E9;
+      --white: #F8FAFC;
+      --gray: #94A3B8;
+      --gray-dark: #64748B;
+      --green: #10B981;
+      --red: #EF4444;
+      --purple: #A78BFA;
+      --font-main: 'Space Grotesk', sans-serif;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-main);
+      background: var(--navy);
+      color: var(--white);
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+    .container { max-width: 860px; margin: 0 auto; padding: 0 24px; }
+    a { color: var(--teal); text-decoration: none; transition: color 0.2s; }
+    a:hover { color: var(--yellow); }
+
+    /* ── Header ── */
+    .back-link {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 24px 0; font-size: 0.9rem; color: var(--gray);
+    }
+    .back-link:hover { color: var(--teal); }
+
+    /* ── Hero ── */
+    .hero {
+      padding: 48px 0 56px;
+      border-bottom: 1px solid rgba(148,163,184,0.15);
+    }
+    .hero h1 {
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 16px;
+    }
+    .hero h1 span { color: var(--yellow); }
+    .hero .subtitle {
+      font-size: 1.1rem;
+      color: var(--gray);
+      max-width: 640px;
+    }
+
+    /* ── Sections ── */
+    .section { padding: 56px 0; border-bottom: 1px solid rgba(148,163,184,0.1); }
+    .section:last-child { border-bottom: none; }
+    .section h2 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--yellow);
+    }
+    .section h3 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin: 28px 0 12px;
+      color: var(--white);
+    }
+    .section p, .section li { color: var(--gray); font-size: 0.95rem; }
+    .section p { margin-bottom: 16px; }
+    .section ul, .section ol { margin: 0 0 16px 20px; }
+    .section li { margin-bottom: 6px; }
+    .section strong { color: var(--white); }
+
+    /* ── Insight Cards ── */
+    .insight {
+      background: var(--navy-light);
+      border-radius: 12px;
+      padding: 24px;
+      margin: 20px 0;
+      border-left: 3px solid var(--teal);
+    }
+    .insight.gold { border-left-color: var(--yellow); }
+    .insight.green { border-left-color: var(--green); }
+    .insight .label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--teal);
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .insight.gold .label { color: var(--yellow); }
+    .insight.green .label { color: var(--green); }
+    .insight p:last-child { margin-bottom: 0; }
+
+    /* ── Tables ── */
+    .table-wrap { overflow-x: auto; margin: 20px 0; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    th {
+      text-align: left;
+      padding: 12px 16px;
+      background: var(--navy-light);
+      color: var(--yellow);
+      font-weight: 600;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    td {
+      padding: 10px 16px;
+      border-bottom: 1px solid rgba(148,163,184,0.1);
+      color: var(--gray);
+    }
+    td strong { color: var(--white); }
+
+    /* ── Energy Stars ── */
+    .stars { color: var(--yellow); letter-spacing: 2px; }
+
+    /* ── Source List ── */
+    .sources {
+      padding: 40px 0 64px;
+    }
+    .sources h2 { margin-bottom: 16px; }
+    .sources a {
+      display: block;
+      padding: 6px 0;
+      font-size: 0.85rem;
+      color: var(--gray-dark);
+    }
+    .sources a:hover { color: var(--teal); }
+
+    /* ── CTA ── */
+    .cta-bar {
+      text-align: center;
+      padding: 48px 0;
+      background: var(--navy-light);
+      border-radius: 16px;
+      margin: 40px 0;
+    }
+    .cta-bar h2 { color: var(--white); margin-bottom: 12px; }
+    .cta-bar p { color: var(--gray); margin-bottom: 24px; }
+    .btn {
+      display: inline-block;
+      padding: 14px 32px;
+      background: var(--yellow);
+      color: var(--navy);
+      font-weight: 700;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(251,191,36,0.3);
+      color: var(--navy);
+    }
+
+    @media (max-width: 640px) {
+      .hero { padding: 32px 0 40px; }
+      .section { padding: 40px 0; }
+      th, td { padding: 8px 12px; font-size: 0.82rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <a href="/" class="back-link">&larr; Back to DJOrganizer</a>
+
+  <div class="hero">
+    <h1>How Pro DJs <span>Actually</span> Organize Their Music</h1>
+    <p class="subtitle">Research from DJ TechTools, Serato forums, Digital DJ Tips, Heavy Hits, and working DJs — distilled into the principles that drive DJOrganizer's design.</p>
+  </div>
+
+  <!-- ── SECTION 1: Genre Folders ── -->
+  <div class="section">
+    <h2>1. Genre Folders — The Sweet Spot</h2>
+    <p>How many genre folders should a DJ have? Too few and you're scrolling through hundreds of tracks. Too many and you're scrolling through folders instead of music.</p>
+
+    <div class="insight gold">
+      <div class="label">Pro Consensus</div>
+      <p><strong>8–15 top-level genre folders</strong> is the sweet spot. Start broad — add subgenres only when a folder exceeds 75–100 tracks. One DJ managing 8,000 tracks uses ~10 major genres with 50 sub-genres across 300 playlists.</p>
+    </div>
+
+    <h3>The Standard Starter Set</h3>
+    <p>Across multiple expert sources, these categories appear repeatedly as the foundation for versatile DJs:</p>
+
+    <div class="table-wrap">
+      <table>
+        <tr><th>Genre</th><th>Includes</th><th>Typical BPM</th></tr>
+        <tr><td><strong>House</strong></td><td>Deep, Tech, Afro House, Progressive, Vocal</td><td>120–130</td></tr>
+        <tr><td><strong>Amapiano</strong></td><td>Log drums, piano melodies, deep bass</td><td>112–115</td></tr>
+        <tr><td><strong>Afrobeats</strong></td><td>Burna Boy, Wizkid, Tems — distinct from Amapiano</td><td>95–110</td></tr>
+        <tr><td><strong>Dancehall</strong></td><td>Current + classic dancehall, soca crossover</td><td>95–110</td></tr>
+        <tr><td><strong>Hip-Hop / R&B</strong></td><td>Current, old school, trap</td><td>70–100</td></tr>
+        <tr><td><strong>Latin</strong></td><td>Reggaeton, dembow, salsa, bachata, Latin house</td><td>90–130</td></tr>
+        <tr><td><strong>Pop / Top 40</strong></td><td>Current radio hits + throwbacks</td><td>100–130</td></tr>
+        <tr><td><strong>Funk / Disco / Soul</strong></td><td>Classic funk, nu-disco, boogie</td><td>110–125</td></tr>
+        <tr><td><strong>Electronic / Techno</strong></td><td>Melodic, peak time, minimal, trance</td><td>125–145</td></tr>
+        <tr><td><strong>Classics</strong></td><td>Cross-genre crowd pleasers by era</td><td>Varies</td></tr>
+      </table>
+    </div>
+
+    <div class="insight">
+      <div class="label">Key Principle</div>
+      <p><strong>Keep each crate to 50–75 songs</strong> (max 125). If a folder gets bigger, split it into subgenres. This forces you to curate instead of hoard. — Heavy Hits</p>
+    </div>
+  </div>
+
+  <!-- ── SECTION 2: Energy Levels ── -->
+  <div class="section">
+    <h2>2. Energy Levels — The Killer Feature</h2>
+    <p>Genre tells you <em>what</em> to play. Energy tells you <em>when</em> to play it. Every serious DJ tags energy — the debate is only about how.</p>
+
+    <h3>System A: Star Ratings (Most Popular)</h3>
+    <p>Works in Rekordbox, Serato, and Traktor. Simple, universal, portable.</p>
+
+    <div class="table-wrap">
+      <table>
+        <tr><th>Rating</th><th>Energy</th><th>When to Play</th></tr>
+        <tr><td><span class="stars">★</span></td><td>Background</td><td>Home listening only</td></tr>
+        <tr><td><span class="stars">★★</span></td><td>Low</td><td>Warm-up, dinner, arrivals</td></tr>
+        <tr><td><span class="stars">★★★</span></td><td>Mid</td><td>Building momentum, transitions</td></tr>
+        <tr><td><span class="stars">★★★★</span></td><td>High</td><td>Prime time, dance floor filling</td></tr>
+        <tr><td><span class="stars">★★★★★</span></td><td>Peak</td><td>Peak-time bangers, crowd eruption</td></tr>
+      </table>
+    </div>
+
+    <h3>System B: Color Coding</h3>
+    <p>Used by DJ Danny James in Rekordbox as a visual layer on top of star ratings.</p>
+    <ul>
+      <li>🔵 Blue = warm-up</li>
+      <li>🟢 Green = commercial / mid-energy</li>
+      <li>🔴 Red = peak-time bangers</li>
+    </ul>
+
+    <h3>System C: Named Energy Tiers</h3>
+    <p>DJ TechTools identifies 7 energy levels: <strong>Sunrise → Kickin' It → Warm-Up → Primetime → Bangin' → Trippin' → Late Night</strong>. These become parent folders with genre subfolders inside each.</p>
+
+    <div class="insight green">
+      <div class="label">DJOrganizer's Approach</div>
+      <p>We combine <strong>genre-first folder structure</strong> with <strong>energy tags inside each genre</strong>. Your folders answer "what genre?" — the energy metadata answers "what moment in the set?"</p>
+    </div>
+  </div>
+
+  <!-- ── SECTION 3: Clean/Explicit ── -->
+  <div class="section">
+    <h2>3. Clean vs. Explicit — Corporate-Ready</h2>
+    <p>Mobile DJs, wedding DJs, and anyone who plays corporate events needs to separate clean from explicit instantly. Three approaches from the field:</p>
+
+    <div class="table-wrap">
+      <table>
+        <tr><th>Method</th><th>How It Works</th><th>Best For</th></tr>
+        <tr><td><strong>Filename suffix</strong></td><td>Add "Clean" or "Explicit" to filename</td><td>Any DJ software — always visible</td></tr>
+        <tr><td><strong>Separate crates</strong></td><td>Mirror crate structure: one clean, one explicit</td><td>Wedding/corporate DJs</td></tr>
+        <tr><td><strong>Metadata tag</strong></td><td>Use Comments or Grouping field</td><td>DJs who filter by metadata in software</td></tr>
+      </table>
+    </div>
+
+    <div class="insight">
+      <div class="label">Best Practice</div>
+      <p><strong>Always default to clean for corporate events.</strong> Only access explicit if the client specifically approves. Tag in the Comments field or use a dedicated metadata column — and always ask the client upfront.</p>
+    </div>
+  </div>
+
+  <!-- ── SECTION 4: Vibe/Moment Tags ── -->
+  <div class="section">
+    <h2>4. Vibe & Moment Tags — Set Intelligence</h2>
+    <p>Beyond genre and energy, experienced DJs tag tracks by the <em>moment</em> they're designed for. This is the layer that separates playlist DJs from set builders.</p>
+
+    <h3>Simple (3 Tiers)</h3>
+    <p>Used by Mr. Sonny James (Serato community):</p>
+    <ul>
+      <li><strong>Opening</strong> — first hour, classic vibes, setting the tone</li>
+      <li><strong>Peak Time</strong> — contemporary, high-energy, crowd-moving</li>
+      <li><strong>Cool Down</strong> — feel-good, closing, emotional</li>
+    </ul>
+
+    <h3>Advanced Tags</h3>
+    <p>From DJ TechTools and the Crossfader community:</p>
+    <ul>
+      <li><strong>Set Opener</strong> — introduces your style (keep at least one per genre)</li>
+      <li><strong>Crowdpleaser</strong> — reliable crowd reaction, any energy level</li>
+      <li><strong>Deep Cut</strong> — emotionally resonant, reserved for set closure</li>
+      <li><strong>Transition Track</strong> — bridges between genres or BPM ranges</li>
+      <li><strong>No Intro</strong> — starts instantly, useful for emergencies</li>
+      <li><strong>MWW (Mixes Well With)</strong> — note which tracks pair well together</li>
+    </ul>
+
+    <div class="insight gold">
+      <div class="label">Pro Tip — Digital DJ Tips</div>
+      <p>Write <strong>"MWW [song name]"</strong> in the Comments field to remember successful transitions. During a live set, this is gold — you never forget a combo that worked.</p>
+    </div>
+  </div>
+
+  <!-- ── SECTION 5: Folder Structure ── -->
+  <div class="section">
+    <h2>5. Folder Structure — What Actually Works</h2>
+
+    <div class="table-wrap">
+      <table>
+        <tr><th>Approach</th><th>Levels</th><th>Best For</th></tr>
+        <tr><td><strong>2-level nested</strong></td><td>Genre → Subgenre</td><td>Most DJs (recommended)</td></tr>
+        <tr><td><strong>3-level nested</strong></td><td>Genre → Sub → Sub</td><td>Libraries over 5,000 tracks</td></tr>
+        <tr><td><strong>Flat + heavy tagging</strong></td><td>One level</td><td>Small libraries under 500 tracks</td></tr>
+        <tr><td><strong>Energy-first</strong></td><td>Energy → Genre</td><td>Club-focused, set-building DJs</td></tr>
+        <tr><td><strong>Event-first</strong></td><td>Event Type → Vibe</td><td>Mobile/wedding DJs</td></tr>
+      </table>
+    </div>
+
+    <div class="insight">
+      <div class="label">Naming Convention</div>
+      <p><strong>Short folder names, no special characters, no emojis.</strong> USB sticks and CDJs handle weird characters poorly. Consistent capitalization throughout. Filenames: <code>ARTIST - TITLE - REMIX</code> standardized with MP3tag.</p>
+    </div>
+
+    <p>The key principle from Heavy Hits: <strong>"Less is more."</strong> Even with 35,000+ tracks, work from focused, curated crates of 50–75 songs during a gig. The big library is for prep; the gig crate is for performance.</p>
+  </div>
+
+  <!-- ── CTA ── -->
+  <div class="cta-bar">
+    <h2>This Research Powers DJOrganizer</h2>
+    <p>Everything above is baked into how DJOrganizer sorts, tags, and structures your library.</p>
+    <a href="/" class="btn">← Back to DJOrganizer</a>
+  </div>
+
+  <!-- ── Sources ── -->
+  <div class="sources">
+    <h2>Sources</h2>
+    <a href="https://djtechtools.com/2022/11/25/controlling-the-dancefloor-a-guide-on-organizing-playlists-by-energy/" target="_blank">DJ TechTools — Organizing Playlists by Energy</a>
+    <a href="https://the-drop.serato.com/culture/how-serato-djs-organize-their-crates/" target="_blank">Serato — How DJs Organize Their Crates</a>
+    <a href="https://www.digitaldjtips.com/beyond-genre-5-tagging-tricks-better-dj-sets/" target="_blank">Digital DJ Tips — 5 Tagging Tricks Beyond Genre</a>
+    <a href="https://wearecrossfader.co.uk/blog/organise-dj-music-collection/" target="_blank">We Are Crossfader — Organise Your DJ Music Collection</a>
+    <a href="https://heavyhits.com/blog/the-absolute-best-way-to-organize-your-virtual-crates/" target="_blank">Heavy Hits — Best Way to Organize Virtual Crates</a>
+    <a href="https://pestrela.github.io/dj_kb/os_folders/" target="_blank">DJ Knowledge Base — OS Folder Organization</a>
+    <a href="https://djwillgill.com/how-to-organize-dj-music/" target="_blank">DJ Will Gill — How to Organize DJ Music</a>
+    <a href="https://dj.studio/blog/dj-music-organizer-software" target="_blank">DJ.Studio — Music Organizer Software</a>
+    <a href="https://news.beatsource.com/clean-edits-for-your-dj-sets/" target="_blank">Beatsource — Clean Edits for DJs</a>
+  </div>
+</div>
+
+</body>
+</html>
