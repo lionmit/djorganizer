@@ -89,11 +89,22 @@ if not exist ".venv" (
     )
 )
 
-call ".venv\Scripts\activate.bat"
+:: Use the venv interpreter by explicit path. Activating and then calling
+:: %PY% would run the SYSTEM python, which has none of the packages we
+:: just installed. That is exactly how "No module named flask" happened.
+set "VENV_PY=.venv\Scripts\python.exe"
+if not exist "%VENV_PY%" (
+    echo.
+    echo   The environment did not build correctly.
+    echo   Delete the .venv folder inside this folder and run this file again.
+    echo.
+    pause
+    exit /b 1
+)
 
 :: ---- Dependencies -------------------------------------------------
 echo   Checking dependencies
-pip install -r requirements.txt --quiet --disable-pip-version-check
+"%VENV_PY%" -m pip install -r requirements.txt --quiet --disable-pip-version-check
 if errorlevel 1 (
     echo.
     echo   Could not install dependencies. Check your internet connection,
@@ -113,7 +124,7 @@ echo   Launching. Your browser will open on its own.
 echo   Keep this window open while you work. Close it to stop.
 echo.
 
-%PY% app.py
+"%VENV_PY%" app.py
 
 echo.
 echo   DJOrganizer stopped.

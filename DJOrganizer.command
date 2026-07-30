@@ -51,11 +51,20 @@ if [ ! -d ".venv" ]; then
     fi
 fi
 
-source .venv/bin/activate
+# Use the venv interpreter by explicit path rather than relying on activation.
+VENV_PY=".venv/bin/python"
+if [ ! -x "$VENV_PY" ]; then
+    echo ""
+    echo "  The environment did not build correctly."
+    echo "  Delete the .venv folder inside this folder and run this file again."
+    echo ""
+    read -p "  Press Enter to close..."
+    exit 1
+fi
 
 # ---- Dependencies ---------------------------------------------------
 echo "  Checking dependencies"
-if ! pip install -r requirements.txt --quiet --disable-pip-version-check; then
+if ! "$VENV_PY" -m pip install -r requirements.txt --quiet --disable-pip-version-check; then
     echo ""
     echo "  Could not install dependencies. Check your internet connection and try again."
     echo ""
@@ -72,7 +81,7 @@ echo "  Launching. Your browser will open on its own."
 echo "  Keep this window open while you work. Close it to stop."
 echo ""
 
-python app.py
+"$VENV_PY" app.py
 
 echo ""
 echo "  DJOrganizer stopped."
