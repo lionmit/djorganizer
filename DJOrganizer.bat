@@ -1,63 +1,68 @@
 @echo off
-title DJOrganizer v19
+title DJOrganizer
 cd /d "%~dp0"
 
-echo DJOrganizer v19 — Starting...
+echo.
+echo   DJOrganizer - starting up
 echo.
 
-:: Check Python 3
+:: ---- Python check -------------------------------------------------
 python --version >nul 2>&1
 if errorlevel 1 (
-    echo Python 3 is required but not installed.
-    echo Download it from: https://www.python.org/downloads/
+    echo   Python 3 is required and was not found.
+    echo.
+    echo   1. Go to https://www.python.org/downloads/
+    echo   2. Download Python 3
+    echo   3. IMPORTANT: tick "Add Python to PATH" during install
+    echo   4. Double-click this file again
     echo.
     pause
     exit /b 1
 )
 
-for /f "tokens=*" %%i in ('python --version') do echo Found: %%i
+for /f "tokens=*" %%i in ('python --version') do echo   Found %%i
 
-:: Create venv if needed
+:: ---- Virtual environment, first run only --------------------------
 if not exist ".venv" (
-    echo Setting up environment ^(first run only^)...
+    echo   Setting up, first run only. This takes a minute.
     python -m venv .venv
-)
-
-:: Activate venv
-call .venv\Scripts\activate
-
-:: Install dependencies
-echo Checking dependencies...
-pip install -r requirements.txt --quiet 2>nul
-
-echo.
-echo Launching DJOrganizer...
-echo Close this window to stop the server.
-echo.
-
-:: Start Flask and capture port from stdout
-:: Write server output to a temp file so we can parse the port
-set "PORTFILE=%TEMP%\djorganizer_port.txt"
-start /b cmd /c "python app.py > "%PORTFILE%" 2>&1"
-
-:: Wait for server to start and extract port
-set PORT=5555
-for /l %%i in (1,1,10) do (
-    timeout /t 1 >nul
-    if exist "%PORTFILE%" (
-        for /f "tokens=*" %%a in ('findstr /c:"127.0.0.1:" "%PORTFILE%"') do (
-            for /f "tokens=2 delims=:" %%b in ("%%a") do set PORT=%%b
-        )
+    if errorlevel 1 (
+        echo.
+        echo   Could not create the environment.
+        echo   Try running this file again, or reinstall Python with
+        echo   "Add Python to PATH" ticked.
+        echo.
+        pause
+        exit /b 1
     )
-    if not "!PORT!"=="5555" goto :open_browser
 )
 
-:open_browser
-start http://127.0.0.1:%PORT%
+call ".venv\Scripts\activate.bat"
 
-:: Run Flask in foreground (restart so it's the main process)
+:: ---- Dependencies -------------------------------------------------
+echo   Checking dependencies
+pip install -r requirements.txt --quiet --disable-pip-version-check
+if errorlevel 1 (
+    echo.
+    echo   Could not install dependencies. Check your internet connection
+    echo   and run this file again.
+    echo.
+    pause
+    exit /b 1
+)
+
+:: ---- Launch -------------------------------------------------------
+:: app.py picks its own free port and opens the browser itself.
+:: Do not start it twice and do not open a browser here: doing so used to
+:: leave two servers running, three browser tabs, and the folder picker
+:: appearing twice.
+echo.
+echo   Launching. Your browser will open on its own.
+echo   Keep this window open while you work. Close it to stop.
+echo.
+
 python app.py
 
 echo.
-echo DJOrganizer stopped.
+echo   DJOrganizer stopped.
 pause

@@ -1,60 +1,62 @@
 #!/bin/bash
-# DJOrganizer v19 — Double-click to launch
-# Automatically sets up Python environment and opens the app
+# DJOrganizer — double-click to launch.
+# Sets up the Python environment on first run, then starts the app.
 
 cd "$(dirname "$0")"
 
-echo "🎵 DJOrganizer v19 — Starting..."
+echo ""
+echo "  DJOrganizer - starting up"
 echo ""
 
-# Check Python 3
+# ---- Python check ---------------------------------------------------
 if ! command -v python3 &> /dev/null; then
-    echo "❌ Python 3 is required but not installed."
-    echo "   Download it from: https://www.python.org/downloads/"
+    echo "  Python 3 is required and was not found."
     echo ""
-    echo "Press Enter to close..."
-    read
+    echo "  1. Go to https://www.python.org/downloads/"
+    echo "  2. Download and install Python 3"
+    echo "  3. Double-click this file again"
+    echo ""
+    read -p "  Press Enter to close..."
     exit 1
 fi
 
-echo "✅ Python 3 found: $(python3 --version)"
+echo "  Found $(python3 --version)"
 
-# Create venv if needed
+# ---- Virtual environment, first run only ----------------------------
 if [ ! -d ".venv" ]; then
-    echo "📦 Setting up environment (first run only)..."
-    python3 -m venv .venv
+    echo "  Setting up, first run only. This takes a minute."
+    if ! python3 -m venv .venv; then
+        echo ""
+        echo "  Could not create the environment. Try again, or reinstall Python 3."
+        echo ""
+        read -p "  Press Enter to close..."
+        exit 1
+    fi
 fi
 
-# Activate venv
 source .venv/bin/activate
 
-# Install dependencies
-echo "📦 Checking dependencies..."
-pip install -r requirements.txt --quiet 2>/dev/null
+# ---- Dependencies ---------------------------------------------------
+echo "  Checking dependencies"
+if ! pip install -r requirements.txt --quiet --disable-pip-version-check; then
+    echo ""
+    echo "  Could not install dependencies. Check your internet connection and try again."
+    echo ""
+    read -p "  Press Enter to close..."
+    exit 1
+fi
+
+# ---- Launch ---------------------------------------------------------
+# app.py picks its own free port and opens the browser itself.
+# Do not start it twice and do not open a browser here, or you get
+# duplicate tabs and a second folder picker.
+echo ""
+echo "  Launching. Your browser will open on its own."
+echo "  Keep this window open while you work. Close it to stop."
+echo ""
+
+python app.py
 
 echo ""
-echo "🚀 Launching DJOrganizer..."
-echo "   Close this window to stop the server."
-echo ""
-
-# Start Flask in background, capture output to detect actual port
-python app.py 2>&1 &
-SERVER_PID=$!
-
-# Wait for server to print its port, then open browser
-for i in $(seq 1 20); do
-    sleep 0.5
-    # Check if server printed its URL
-    PORT=$(lsof -iTCP -sTCP:LISTEN -nP -p $SERVER_PID 2>/dev/null | grep -oE '127\.0\.0\.1:[0-9]+' | head -1 | cut -d: -f2)
-    if [ -n "$PORT" ]; then
-        echo "   Opening http://127.0.0.1:$PORT"
-        open "http://127.0.0.1:$PORT"
-        break
-    fi
-done
-
-# Wait for server process — closing Terminal kills it
-wait $SERVER_PID
-
-echo ""
-echo "DJOrganizer stopped."
+echo "  DJOrganizer stopped."
+read -p "  Press Enter to close..."
