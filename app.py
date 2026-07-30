@@ -108,6 +108,8 @@ def create_app(testing=False):
                     title=metadata.get("title") or "",
                     album=metadata.get("album") or "",
                     tag_genre=metadata.get("genre") or "",
+                    duration_seconds=metadata.get("duration"),
+                    size_bytes=f.stat().st_size if f.exists() else None,
                 )
                 tags = tag_file(f, classification, metadata)
                 track_dict = {**tags.__dict__, "filepath": str(tags.filepath)}
@@ -168,9 +170,45 @@ def create_app(testing=False):
             return jsonify({"error": "No scan performed — scan a folder first"}), 400
         scanned_root = Path(scanned_source).resolve()
 
+        # ---- Decide what should never reach a genre folder -----------------
+        # Duplicates and sample-library content are filtered here, before the
+        # sort, not cleaned up afterwards. Filing 780 duplicate copies into
+        # genre folders and then asking a DJ to find them again is not a
+        # workflow. Everything set aside lands under one review folder so it
+        # can be checked and deleted in a single action.
+        from engine.dedupe import find_duplicates, is_sample_library
+
+        REVIEW_ROOT = "_REVIEW (safe to delete)"
+        aside = {}          # str(path) -> (subfolder, reason)
+
+        candidate_paths = []
+        for t in tracks:
+            p_ = Path(t.get("filepath", ""))
+            if p_.exists() and p_.is_file():
+                candidate_paths.append(p_)
+
+        for p_ in candidate_paths:
+            try:
+                reason = is_sample_library(p_, size_bytes=p_.stat().st_size)
+            except OSError:
+                reason = None
+            if reason:
+                aside[str(p_)] = ("Samples and one-shots", reason)
+
+        try:
+            for grp in find_duplicates([p_ for p_ in candidate_paths
+                                        if str(p_) not in aside]):
+                for d in grp.drop:
+                    aside[str(d)] = (
+                        "Duplicates",
+                        f"{grp.detail}. Kept: {grp.keep.name}")
+        except Exception:
+            pass    # dedupe is an improvement, never a reason to fail a sort
+
         # Execute sort
         moves = []
         errors = []
+        set_aside = []
         MAX_DUP = 9999
         for t in tracks:
             src = Path(t.get("filepath", ""))
@@ -189,7 +227,18 @@ def create_app(testing=False):
                 errors.append({"file": str(src), "error": "Path resolution failed"})
                 continue
 
-            genre_folder = get_folder_name(t["genre"])
+            # Anything set aside goes to the single review folder, keeping the
+            # reason with it so the DJ can judge rather than trust.
+            held = aside.get(str(src))
+            if held:
+                subfolder, reason = held
+                genre_folder = f"{REVIEW_ROOT}/{subfolder}"
+                set_aside.append({"file": src.name, "why": reason,
+                                  "bucket": subfolder})
+            elif t.get("genre") == "inbox":
+                genre_folder = f"{REVIEW_ROOT}/Unsorted"
+            else:
+                genre_folder = get_folder_name(t["genre"])
             dest_dir = output_path / genre_folder
             dest_dir.mkdir(parents=True, exist_ok=True)
 
@@ -223,6 +272,8 @@ def create_app(testing=False):
 
         MOVES_FILE.write_text(json.dumps({
             "copy_mode": copy_mode,
+            "set_aside": set_aside,
+            "set_aside_count": len(set_aside),
             "moves": moves
         }, indent=2), encoding="utf-8")
 

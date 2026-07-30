@@ -39,7 +39,6 @@ TOOLS_KEYWORDS = [
     "rimshot", "rim shot", "tamb loop",
     "openhh",
     "closedhh",
-    "kryptogram",
     "traktorset",
     "pfc midburn",
 ]

@@ -177,8 +177,23 @@ def _has_old_year(name_lower: str) -> bool:
     match = re.search(r'\b(19\d{2})\b', name_lower)
     return match is not None
 
+def _looks_like_a_tool(filepath: Path, duration_seconds=None, size_bytes=None) -> bool:
+    """A tool keyword only counts on a file that is actually short or tiny."""
+    try:
+        if size_bytes is None:
+            size_bytes = filepath.stat().st_size
+    except OSError:
+        size_bytes = None
+    if duration_seconds is not None:
+        return duration_seconds < 100
+    if size_bytes is not None:
+        return size_bytes < 2_500_000        # roughly 100 seconds at 192 kbps
+    return False
+
+
 def classify_file(filepath: Path, artist: str = "", title: str = "",
-                  album: str = "", tag_genre: str = "") -> ClassificationResult:
+                  album: str = "", tag_genre: str = "",
+                  duration_seconds=None, size_bytes=None) -> ClassificationResult:
     """Classify a single file.
 
     Matching runs against the filename AND the tag fields. Filenames are often
@@ -192,12 +207,16 @@ def classify_file(filepath: Path, artist: str = "", title: str = "",
     haystack = " | ".join(parts)
     name_lower = unicodedata.normalize('NFC', haystack).lower()
 
-    # 1. Tools & FX — filename only. Matching tool words against tag text
-    #    misfires badly, because "Kick" and "Clap" are ordinary title words.
+    # 1. Tools & FX. A keyword alone is not enough evidence: "Kick Back" and
+    #    "Scratch My Back" are real records that were being filed as one-shots.
+    #    The file must also LOOK like a tool, meaning short or tiny, which is
+    #    what engine.dedupe already knows how to decide.
     fname_lower = unicodedata.normalize('NFC', name).lower()
     for kw in GENRE_KEYWORDS.get("tools", []):
         if kw in fname_lower:
-            return ClassificationResult("tools", f"Tool/FX keyword: '{kw}'")
+            if _looks_like_a_tool(filepath, duration_seconds, size_bytes):
+                return ClassificationResult("tools", f"Tool/FX keyword: '{kw}'")
+            break   # keyword matched but it is a real track, keep classifying
 
     # 2. Locale detection — character-based, on tags too, since Hebrew and
     #    Arabic tracks are frequently saved under transliterated filenames.
