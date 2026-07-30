@@ -6,7 +6,7 @@ from typing import Optional
 from dataclasses import dataclass
 from .keywords import GENRE_KEYWORDS as _V19_KEYWORDS
 from .keywords_openformat import OPENFORMAT_KEYWORDS as _OPENFORMAT
-from .genres import CORE_GENRES, LOCALE_GENRES
+from .genres import CORE_GENRES, LOCALE_GENRES, resolve_genre_key
 from .keywords_openformat import (DISNEY_KEYWORDS, DISNEY_REMIX_SIGNALS,
                                   DISNEY_COVER_SIGNALS)
 
@@ -85,19 +85,20 @@ TAG_GENRE_MAP = {
 #     otherwise win against everything.
 # ---------------------------------------------------------------------------
 _PRIORITY = [
-    # Disney and screen music, resolved by a dedicated rule below
+    # Disney and screen, resolved by a dedicated rule below
     "disney_remix", "disney_covers", "disney", "soundtrack",
-    # function crates, pulled by name at a gig
-    "ecstatic_ceremony", "wedding_ceremony",
-    # unmistakable artist signatures
-    "hard_dance", "dubstep", "drill", "trap_twerk", "global_bass",
-    "balkan_gypsy", "amapiano", "afro_house", "afrobeats", "reggae_dancehall",
-    "numetal", "trance", "techno", "deep_melodic_house", "disco_nudisco",
-    "bass_dnb_garage", "house", "latin",
-    # eras, below real genres
-    "oldies_motown", "eighties", "nineties", "twothousands",
+    # function crates a DJ pulls by name
+    "ecstatic_ceremony", "wedding_ceremony", "slow",
+    # sharpest artist signatures first
+    "hardstyle", "hard_dance", "psytrance", "dubstep", "drill", "twerk",
+    "trap", "garage", "dnb", "moombahton", "baile_funk", "balkan",
+    "amapiano", "dancehall", "reggae", "afro_house", "afrobeats",
+    "reggaeton", "numetal", "punk", "techno", "tech_house", "trance",
+    "nudisco", "disco", "deep_melodic_house", "house", "latin",
+    # eras and roots below real genres
+    "motown", "oldies_motown", "eighties", "nineties", "twothousands",
     # broader but still shaped
-    "rnb_soul_modern", "hiphop", "indie_altpop", "rock", "funk_soul",
+    "rnb", "soul", "hiphop", "indie_altpop", "rock", "funk", "jazz",
     "world_ethnic", "chill_downtempo", "country",
     # only when nothing else explained the track
     "mashup", "electronic", "pop",
@@ -105,9 +106,15 @@ _PRIORITY = [
 
 def _build_keyword_table():
     merged = {"tools": _V19_KEYWORDS.get("tools", [])}
-    # v19 lists that v20 kept, plus the split of funk_disco_soul
-    carried = dict(_V19_KEYWORDS)
-    carried["funk_soul"] = carried.pop("funk_disco_soul", [])
+    # Route every legacy key through the alias map so a v19 name like
+    # "bass_dnb_garage" can never reach the user after v20 split it into
+    # Drum & Bass and UK Garage. Without this the classifier returns a key
+    # the folder map and the UI label map have never heard of.
+    carried = {}
+    for key, words in _V19_KEYWORDS.items():
+        if key == "tools":
+            continue
+        carried.setdefault(resolve_genre_key(key), []).extend(words)
     for key in _PRIORITY:
         words = list(_OPENFORMAT.get(key, [])) + list(carried.get(key, []))
         if words:

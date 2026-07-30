@@ -1982,3 +1982,158 @@ OPENFORMAT_KEYWORDS["chill_downtempo"] = (
     OPENFORMAT_KEYWORDS.get("chill_downtempo", []) + NU_JAZZ_BROKEN_BEAT)
 OPENFORMAT_KEYWORDS["electronic"] = (
     OPENFORMAT_KEYWORDS.get("electronic", []) + MODERN_ELECTRONIC_MISC)
+
+
+# ---------------------------------------------------------------------------
+# v20 split lists.
+#
+# A DJ reaching for a record mid-set thinks in one word: "garage", "disco",
+# "techno". Compound folders like "Bass DnB & Garage" force a second decision
+# at the worst possible moment, so every merged crate was split and the
+# keywords routed to the sharper side.
+# ---------------------------------------------------------------------------
+
+TECH_HOUSE_KEYWORDS = [
+    "tech house", "fisher", "chris lake", "solardo", "patrick topping",
+    "hot since 82", "green velvet", "cloonee", "dom dolla", "john summit",
+    "james hype", "michael bibi", "sosa uk", "wade ", "latmun", "mason maynard",
+    "eli brown", "biscits", "kevin knapp", "danny howard", "billy gillies",
+]
+TECHNO_ONLY_KEYWORDS = [
+    "techno", "charlotte de witte", "amelie lens", "adam beyer", "carl cox",
+    "richie hawtin", "boris brejcha", "drumcode", "nina kraviz", "i hate models",
+    "reinier zonneveld", "899", "kobosil", "sara landry", "hard techno",
+    "minimal techno", "melodic techno", "industrial techno", "peak time techno",
+]
+DISCO_ONLY_KEYWORDS = [
+    "disco", "bee gees", "chic ", "nile rodgers", "donna summer",
+    "earth wind & fire", "kool & the gang", "sister sledge", "the trammps",
+    "gloria gaynor", "village people", "abba", "boney m", "kc and the sunshine",
+    "diana ross", "the jacksons", "shalamar", "cerrone", "giorgio moroder",
+    "italo disco", "discotheque", "studio 54", "saturday night fever",
+]
+NUDISCO_KEYWORDS = [
+    "nu disco", "nu-disco", "purple disco machine", "dimitri from paris",
+    "todd terje", "breakbot", "roisin murphy", "l'imperatrice", "parcels",
+    "folamour", "yuksek", "kraak & smaak", "the reflex", "dr packer",
+    "michael gray", "aeroplane", "escort ", "jungle band", "french house",
+    "filter house", "daft punk", "justice ", "cassius ", "modjo", "stardust",
+]
+PSYTRANCE_KEYWORDS = [
+    "psytrance", "psy trance", "goa trance", "vini vici", "astrix",
+    "infected mushroom", "ace ventura", "captain hook", "berg ", "liquid soul",
+    "ritmo ", "blastoyz", "hilight tribe", "shpongle", "full on", "hi-tech psy",
+    "forest psy", "progressive psy", "psychedelic trance",
+]
+TRANCE_ONLY_KEYWORDS = [
+    "trance", "armin van buuren", "above & beyond", "paul van dyk",
+    "ferry corsten", "gareth emery", "cosmic gate", "aly & fila", "anjunabeats",
+    "a state of trance", "uplifting trance", "vocal trance", "andrew rayel",
+]
+DNB_ONLY_KEYWORDS = [
+    "drum & bass", "drum and bass", "dnb", "d&b", "liquid dnb", "neurofunk",
+    "netsky", "sub focus", "wilkinson", "pendulum", "chase & status", "andy c",
+    "hybrid minds", "dimension", "culture shock", "koven", "metrik", "rudimental",
+    "maduk", "logistics", "high contrast", "camo & krooked", "fred v", "grafix",
+    "london elektricity", "matrix & futurebound", "kings of the rollers",
+    "bou ", "hedex", "a.m.c", "turno", "macky gee", "benny l", "mefjus",
+    "noisia", "black sun empire", "delta heavy", "dc breaks", "1991 dnb",
+]
+GARAGE_KEYWORDS = [
+    "uk garage", "ukg", "2 step", "2-step", "speed garage", "bassline",
+    "sammy virji", "interplanetary criminal", "main phase", "salute ",
+    "conducta", "bakey", "skepsis", "holy goof", "chris lorenzo", "kettama",
+    "todd edwards", "mj cole", "artful dodger", "wookie ", "burial ",
+    "sherelle", "window kid", "notion ", "badger ", "y u qt", "tsuki ",
+]
+TWERK_ONLY_KEYWORDS = [
+    "twerk", "jersey club", "juke ", "booty bass", "percolat", "shake dat",
+    "donk ", "baltimore club", "ghetto tech",
+]
+TRAP_ONLY_KEYWORDS = [
+    "trap ", "migos", "travis scott", "gucci mane", "21 savage", "lil uzi",
+    "playboi carti", "metro boomin", "waka flocka", "rae sremmurd", "baauer",
+    "rl grime", "flosstradamus", "carnage ", "yellow claw", "ape drums",
+]
+REGGAE_ONLY_KEYWORDS = [
+    "reggae", "bob marley", "peter tosh", "jimmy cliff", "toots and the maytals",
+    "burning spear", "gregory isaacs", "dennis brown", "steel pulse",
+    "roots reggae", "lovers rock", "dub plate", "rocksteady", "ska ",
+    "protoje", "chronixx", "damian marley", "ziggy marley",
+]
+DANCEHALL_KEYWORDS = [
+    "dancehall", "sean paul", "shaggy", "vybz kartel", "popcaan", "spice ",
+    "beenie man", "bounty killer", "elephant man", "konshens", "shenseea",
+    "skillibeng", "masicka", "gyptian", "mr vegas", "busy signal", "alkaline",
+]
+REGGAETON_ONLY_KEYWORDS = [
+    "reggaeton", "daddy yankee", "j balvin", "bad bunny", "don omar", "ozuna",
+    "maluma", "karol g", "wisin", "yandel", "nicky jam", "farruko", "tego calderon",
+    "rauw alejandro", "feid ", "myke towers", "arcangel", "de la ghetto",
+    "anuel aa", "becky g", "natti natasha", "sech ", "dembow",
+]
+MOOMBAHTON_KEYWORDS = [
+    "moombahton", "dave nada", "munchi ", "moombahcore", "moombah",
+]
+PUNK_ONLY_KEYWORDS = [
+    "blink-182", "green day", "the offspring", "sum 41", "ramones",
+    "sex pistols", "the clash", "bad religion", "nofx", "rancid", "misfits",
+    "anti-flag", "pennywise", "descendents", "social distortion", "dead kennedys",
+    "punk rock", "pop punk", "hardcore punk", "skate punk",
+]
+FUNK_ONLY_KEYWORDS = [
+    "funk", "james brown", "parliament", "funkadelic", "bootsy collins",
+    "the meters", "tower of power", "average white band", "cameo ",
+    "rick james", "zapp ", "roger troutman", "the gap band", "ohio players",
+    "vulfpeck", "cory wong", "jamiroquai", "incognito ", "brand new heavies",
+]
+SOUL_ONLY_KEYWORDS = [
+    "soul", "aretha franklin", "otis redding", "sam cooke", "al green",
+    "bill withers", "curtis mayfield", "donny hathaway", "roberta flack",
+    "isaac hayes", "gladys knight", "the isley brothers", "teddy pendergrass",
+    "northern soul", "southern soul", "deep soul",
+]
+MOTOWN_KEYWORDS = [
+    "motown", "the supremes", "marvin gaye", "the temptations", "four tops",
+    "smokey robinson", "the miracles", "martha and the vandellas",
+    "jackson 5", "the jackson five", "mary wells", "edwin starr",
+    "junior walker", "the marvelettes", "tammi terrell",
+]
+JAZZ_KEYWORDS = [
+    "jazz", "miles davis", "john coltrane", "duke ellington", "louis armstrong",
+    "ella fitzgerald", "billie holiday", "nina simone", "dave brubeck",
+    "thelonious monk", "chet baker", "stan getz", "herbie hancock",
+    "bossa nova", "big band", "swing ", "bebop", "nu jazz", "jazz funk",
+    "alfa mist", "yussef dayes", "ezra collective", "kamasi washington",
+]
+SLOW_JAMS_KEYWORDS = [
+    "slow jam", "quiet storm", "baby making", "bedroom playlist",
+    "boyz ii men", "jodeci", "keith sweat", "silk ", "112 ", "next ",
+    "dru hill", "joe ", "case ", "tank ", "avant ", "ginuwine",
+]
+
+OPENFORMAT_KEYWORDS.update({
+    "tech_house": TECH_HOUSE_KEYWORDS,
+    "techno": TECHNO_ONLY_KEYWORDS,
+    "disco": DISCO_ONLY_KEYWORDS,
+    "nudisco": NUDISCO_KEYWORDS,
+    "trance": TRANCE_ONLY_KEYWORDS,
+    "psytrance": PSYTRANCE_KEYWORDS,
+    "dnb": DNB_ONLY_KEYWORDS,
+    "garage": GARAGE_KEYWORDS,
+    "trap": TRAP_ONLY_KEYWORDS,
+    "twerk": TWERK_ONLY_KEYWORDS,
+    "reggae": REGGAE_ONLY_KEYWORDS,
+    "dancehall": DANCEHALL_KEYWORDS,
+    "reggaeton": REGGAETON_ONLY_KEYWORDS,
+    "moombahton": MOOMBAHTON_KEYWORDS,
+    "baile_funk": OPENFORMAT_KEYWORDS.get("global_bass", []),
+    "balkan": OPENFORMAT_KEYWORDS.get("balkan_gypsy", []),
+    "rnb": OPENFORMAT_KEYWORDS.get("rnb_soul_modern", []),
+    "punk": PUNK_ONLY_KEYWORDS,
+    "funk": FUNK_ONLY_KEYWORDS,
+    "soul": SOUL_ONLY_KEYWORDS,
+    "motown": MOTOWN_KEYWORDS,
+    "jazz": JAZZ_KEYWORDS,
+    "slow": SLOW_JAMS_KEYWORDS,
+})
