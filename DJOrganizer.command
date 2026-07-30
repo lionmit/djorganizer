@@ -22,6 +22,23 @@ fi
 
 echo "  Found $(python3 --version)"
 
+# ---- Are the other files actually here? ------------------------------
+# Running the launcher from outside the unpacked folder leaves everything
+# else behind. Fail with a real explanation instead of a pip error.
+if [ ! -f "requirements.txt" ] || [ ! -f "app.py" ]; then
+    echo ""
+    echo "  The rest of DJOrganizer is missing from this folder."
+    echo ""
+    echo "  Unzip the download first, then open the folder it creates"
+    echo "  (djorganizer-main) and double-click DJOrganizer.command in there."
+    echo ""
+    echo "  Current folder: $(pwd)"
+    echo ""
+    read -p "  Press Enter to close..."
+    exit 1
+fi
+
+
 # ---- Virtual environment, first run only ----------------------------
 if [ ! -d ".venv" ]; then
     echo "  Setting up, first run only. This takes a minute."

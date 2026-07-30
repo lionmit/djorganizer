@@ -46,6 +46,34 @@ if not defined PY (
 
 for /f "tokens=*" %%i in ('%PY% --version') do echo   Found %%i
 
+:: ---- Are the other files actually here? ---------------------------
+:: Double-clicking a .bat from inside a zip makes Windows extract only
+:: that one file to a temp folder and run it there, so everything else
+:: is missing. This is the most common first-run failure.
+if not exist "requirements.txt" goto :not_extracted
+if not exist "app.py" goto :not_extracted
+goto :files_ok
+
+:not_extracted
+echo.
+echo   The rest of DJOrganizer is missing from this folder.
+echo.
+echo   You are almost certainly running this from inside the ZIP.
+echo   Windows only unpacks the one file you double-click.
+echo.
+echo   Fix it:
+echo     1. Right-click the downloaded ZIP file
+echo     2. Choose "Extract All"
+echo     3. Open the folder it creates ^(djorganizer-main^)
+echo     4. Double-click DJOrganizer.bat in THERE
+echo.
+echo   Current folder: %CD%
+echo.
+pause
+exit /b 1
+
+:files_ok
+
 :: ---- Virtual environment, first run only --------------------------
 if not exist ".venv" (
     echo   Setting up, first run only. This takes a minute.
@@ -68,7 +96,7 @@ echo   Checking dependencies
 pip install -r requirements.txt --quiet --disable-pip-version-check
 if errorlevel 1 (
     echo.
-    echo   Could not install dependencies. Check your internet connection
+    echo   Could not install dependencies. Check your internet connection,
     echo   and run this file again.
     echo.
     pause
