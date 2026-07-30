@@ -7,25 +7,49 @@ echo   DJOrganizer - starting up
 echo.
 
 :: ---- Python check -------------------------------------------------
-python --version >nul 2>&1
-if errorlevel 1 (
-    echo   Python 3 is required and was not found.
+:: Try the py launcher first. The official python.org installer always
+:: installs py.exe, and it keeps working even when "python" does not,
+:: which is the usual reason Windows reports Python as missing.
+set "PY="
+py -3 --version >nul 2>&1
+if not errorlevel 1 set "PY=py -3"
+
+if not defined PY (
+    python --version >nul 2>&1
+    if not errorlevel 1 set "PY=python"
+)
+
+if not defined PY (
+    python3 --version >nul 2>&1
+    if not errorlevel 1 set "PY=python3"
+)
+
+if not defined PY (
+    echo   Python 3 was not found.
     echo.
-    echo   1. Go to https://www.python.org/downloads/
-    echo   2. Download Python 3
-    echo   3. IMPORTANT: tick "Add Python to PATH" during install
-    echo   4. Double-click this file again
+    echo   Install it:
+    echo     1. Go to https://www.python.org/downloads/
+    echo     2. Download Python 3 for Windows and run the installer
+    echo     3. On the FIRST screen, tick "Add python.exe to PATH" at the
+    echo        bottom. This is the step everyone misses.
+    echo     4. Finish, then double-click this file again.
+    echo.
+    echo   Already installed it and still seeing this?
+    echo     Windows ships a fake python.exe that opens the Microsoft Store.
+    echo     Turn it off: Settings ^> Apps ^> Advanced app settings ^>
+    echo     App execution aliases ^> switch OFF python.exe and python3.exe
+    echo     Then double-click this file again.
     echo.
     pause
     exit /b 1
 )
 
-for /f "tokens=*" %%i in ('python --version') do echo   Found %%i
+for /f "tokens=*" %%i in ('%PY% --version') do echo   Found %%i
 
 :: ---- Virtual environment, first run only --------------------------
 if not exist ".venv" (
     echo   Setting up, first run only. This takes a minute.
-    python -m venv .venv
+    %PY% -m venv .venv
     if errorlevel 1 (
         echo.
         echo   Could not create the environment.
@@ -61,7 +85,7 @@ echo   Launching. Your browser will open on its own.
 echo   Keep this window open while you work. Close it to stop.
 echo.
 
-python app.py
+%PY% app.py
 
 echo.
 echo   DJOrganizer stopped.
