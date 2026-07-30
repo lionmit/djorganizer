@@ -115,13 +115,20 @@ def _build_keyword_table():
         if key == "tools":
             continue
         carried.setdefault(resolve_genre_key(key), []).extend(words)
+    # Same forward-mapping for the v20 lists, which still carry a few of the
+    # pre-split names so the file stays readable.
+    openformat = {}
+    for key, words in _OPENFORMAT.items():
+        openformat.setdefault(resolve_genre_key(key), []).extend(words)
+
     for key in _PRIORITY:
-        words = list(_OPENFORMAT.get(key, [])) + list(carried.get(key, []))
-        if words:
+        key = resolve_genre_key(key)
+        words = list(openformat.get(key, [])) + list(carried.get(key, []))
+        if words and key not in merged:
             merged[key] = words
     # anything defined but not ranked still gets a chance, before INBOX
-    for key, words in list(_OPENFORMAT.items()) + list(carried.items()):
-        if key not in merged and key != "tools" and words:
+    for key, words in list(openformat.items()) + list(carried.items()):
+        if key not in merged and key != "tools" and words and key in CORE_GENRES:
             merged[key] = words
     return merged
 
