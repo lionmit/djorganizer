@@ -74,29 +74,30 @@ exit /b 1
 
 :files_ok
 
-:: ---- Virtual environment, first run only --------------------------
-if not exist ".venv" (
-    echo   Setting up, first run only. This takes a minute.
-    %PY% -m venv .venv
-    if errorlevel 1 (
-        echo.
-        echo   Could not create the environment.
-        echo   Try running this file again, or reinstall Python with
-        echo   "Add Python to PATH" ticked.
-        echo.
-        pause
-        exit /b 1
+:: ---- Virtual environment ------------------------------------------
+:: Self-healing. A half-built environment from an interrupted or failed
+:: earlier run used to leave the app broken with no way forward except
+:: telling the user to hunt down a hidden .venv folder and delete it.
+:: Never ask a musician to do that. Detect it and rebuild silently.
+set "VENV_PY=.venv\Scripts\python.exe"
+
+if exist ".venv" (
+    if not exist "%VENV_PY%" (
+        echo   Repairing a previous incomplete setup
+        rmdir /s /q ".venv"
     )
 )
 
-:: Use the venv interpreter by explicit path. Activating and then calling
-:: %PY% would run the SYSTEM python, which has none of the packages we
-:: just installed. That is exactly how "No module named flask" happened.
-set "VENV_PY=.venv\Scripts\python.exe"
+if not exist ".venv" (
+    echo   Setting up, first run only. This takes a minute.
+    %PY% -m venv .venv
+)
+
 if not exist "%VENV_PY%" (
     echo.
-    echo   The environment did not build correctly.
-    echo   Delete the .venv folder inside this folder and run this file again.
+    echo   Setup did not finish. This is almost always antivirus or a
+    echo   OneDrive-synced folder blocking it.
+    echo   Move this folder to your Desktop and double-click again.
     echo.
     pause
     exit /b 1

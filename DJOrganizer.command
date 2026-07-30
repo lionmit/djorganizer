@@ -39,24 +39,26 @@ if [ ! -f "requirements.txt" ] || [ ! -f "app.py" ]; then
 fi
 
 
-# ---- Virtual environment, first run only ----------------------------
-if [ ! -d ".venv" ]; then
-    echo "  Setting up, first run only. This takes a minute."
-    if ! python3 -m venv .venv; then
-        echo ""
-        echo "  Could not create the environment. Try again, or reinstall Python 3."
-        echo ""
-        read -p "  Press Enter to close..."
-        exit 1
-    fi
+# ---- Virtual environment ---------------------------------------------
+# Self-healing. A half-built environment from a failed earlier run is
+# detected and rebuilt, rather than telling the user to go and delete a
+# hidden folder.
+VENV_PY=".venv/bin/python"
+
+if [ -d ".venv" ] && [ ! -x "$VENV_PY" ]; then
+    echo "  Repairing a previous incomplete setup"
+    rm -rf .venv
 fi
 
-# Use the venv interpreter by explicit path rather than relying on activation.
-VENV_PY=".venv/bin/python"
+if [ ! -d ".venv" ]; then
+    echo "  Setting up, first run only. This takes a minute."
+    python3 -m venv .venv
+fi
+
 if [ ! -x "$VENV_PY" ]; then
     echo ""
-    echo "  The environment did not build correctly."
-    echo "  Delete the .venv folder inside this folder and run this file again."
+    echo "  Setup did not finish. Move this folder to your Desktop"
+    echo "  and double-click again."
     echo ""
     read -p "  Press Enter to close..."
     exit 1
