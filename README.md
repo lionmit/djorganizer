@@ -28,6 +28,21 @@ That's it. No terminal, no commands, no setup.
 2. **Review** all tracks with 12 auto-detected tags in a sortable, filterable table
 3. **Sort** into genre folders with one click
 
+## After Sorting: reconnect your DJ software
+
+By default DJOrganizer **copies**, so your originals stay exactly where they are and your DJ software keeps working untouched. Budget disk space accordingly: sorting a 96 GB library needs another 96 GB free. The app checks before it starts.
+
+If you turn copy-safe off and let it **move** files, your DJ software will show the tracks as missing until you point it at their new home. **Your cue points and BPM analysis are not lost.** They live in the software's own database, keyed to the track, not to the folder. You are only repairing a broken path. Do it immediately after sorting, not weeks later.
+
+| Software | What to do |
+|---|---|
+| **rekordbox** | File → Library → Relocate → **Auto Relocate** |
+| **DJUCED** | Song Library → All Songs → gear icon → **Check Library**. Re-links everything in one pass. Single track: right-click → **Relocate** |
+| **Serato** | Files panel → drag the new parent folder onto the missing tracks, or Relocate Lost Files |
+| **Traktor** | Right-click the track or playlist → **Relocate**, then point at the new parent folder |
+
+**Playing on CDJs?** No DJ software except rekordbox can write the database Pioneer/AlphaTheta players read. Sort here, then import into rekordbox, analyse, build playlists, and export to a FAT32 USB from rekordbox itself.
+
 ## Privacy
 
 All data stays on your computer. Nothing is uploaded or shared. The app runs entirely on localhost.
