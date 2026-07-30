@@ -210,8 +210,7 @@ HOUSE_KEYWORDS = [
     # ─ Genre terms ─
     "house ", " house_", "deep house", "tech house",
     "progressive house", "electro house",
-    "dance floor", "dancefloor", "club mix", "club edit",
-    "extended mix", "radio edit", "original mix",
+    "dance floor", "dancefloor", 
     "_extended_mix", "_original_mix", "_club_mix", "_radio_edit",
     "bootleg", "mashup", "mash-up", "mash up",
     "nu disco", "nudisco",
@@ -418,7 +417,6 @@ AFROBEATS_KEYWORDS = [
     "beenie man", "sean paul",
     "shaggy", "vybz kartel",
     "popcaan", "alkaline",
-    "spice ",
     "machel montano",
     "bunji garlin",
     "bombo clat",
@@ -449,7 +447,6 @@ REGGAE_DANCEHALL_KEYWORDS = [
     "ragga ", "raggamuffin",
     "mento ",
     "bashment",
-    "jungle ",
 ]
 
 HIPHOP_KEYWORDS = [
@@ -828,6 +825,10 @@ LATIN_KEYWORDS = [
 ]
 
 BASS_DNB_GARAGE_KEYWORDS = [
+    # "jungle" belongs to the DnB family only. It used to sit in the reggae
+    # list too, which is checked earlier, so real jungle tracks were filed
+    # as dancehall.
+    "jungle ", "jungle(", "jungle anthem", "junglist", "ragga jungle",
     # ─ Drum & Bass ─
     "goldie", "ltj bukem",
     "roni size", "bad boy bill",

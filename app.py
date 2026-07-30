@@ -99,8 +99,16 @@ def create_app(testing=False):
             tracks = []
             locale_counts = {}
             for i, f in enumerate(audio_files):
-                classification = classify_file(f)
+                # Read tags FIRST so the classifier can use artist and title.
+                # Filenames from download sites are often just "(320kbps)".
                 metadata = read_metadata(f)
+                classification = classify_file(
+                    f,
+                    artist=metadata.get("artist") or "",
+                    title=metadata.get("title") or "",
+                    album=metadata.get("album") or "",
+                    tag_genre=metadata.get("genre") or "",
+                )
                 tags = tag_file(f, classification, metadata)
                 track_dict = {**tags.__dict__, "filepath": str(tags.filepath)}
                 tracks.append(track_dict)
