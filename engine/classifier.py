@@ -9,7 +9,8 @@ from .keywords_openformat import OPENFORMAT_KEYWORDS as _OPENFORMAT
 from .genres import CORE_GENRES, LOCALE_GENRES, resolve_genre_key
 from .artists import lookup as artist_lookup, bulk_lookup as artist_bulk
 from .decide import (Evidence, decide, remix_credit, split_collaborators,
-                     W_REMIX_CREDIT, W_TITLE_KEYWORD, W_ARTIST_PRIOR)
+                     W_REMIX_CREDIT, W_TITLE_KEYWORD, W_ARTIST_PRIOR,
+                     W_ARTIST_KNOWN)
 from .keywords_openformat import (DISNEY_KEYWORDS, DISNEY_REMIX_SIGNALS,
                                   DISNEY_COVER_SIGNALS)
 
@@ -193,13 +194,22 @@ def _first_keyword(text: str):
     return None
 
 
+# Credits that name nobody. They used to vote, and "Unknown" was confidently
+# filing tracks into World.
+_NOT_AN_ARTIST = {
+    "unknown", "unknown artist", "various", "various artists", "va",
+    "traditional", "n/a", "none", "no artist", "untitled", "compilation",
+    "soundtrack", "original soundtrack", "ost", "my mix", "mix", "dj mix",
+}
+
+
 def _genre_for_text(text: str):
     """Best genre for a bare name, used for remixers and each collaborator.
 
     The curated artist table is asked first: it holds full names, so it beats
     a keyword scan that might catch a common word inside the same string.
     """
-    if not text:
+    if not text or text.strip().lower() in _NOT_AN_ARTIST:
         return None
     known = artist_lookup(text)          # hand-checked, wins
     if known:
@@ -301,9 +311,18 @@ def classify_file(filepath: Path, artist: str = "", title: str = "",
     #    3c. Each named party votes separately and weakly, so two artists from
     #        two genres produce a visible contest rather than a silent winner.
     for party in (split_collaborators(artist) or ([artist] if artist else [])):
+        if not party or party.strip().lower() in _NOT_AN_ARTIST:
+            continue
+        known = artist_lookup(party) or artist_bulk(party)
+        if known:
+            # A named artist found in a real database is solid evidence.
+            evidence.append(Evidence(known, W_ARTIST_KNOWN,
+                                     f"{party.strip()} is known for this"))
+            continue
         g = _genre_for_text(party)
         if g:
-            evidence.append(Evidence(g, W_ARTIST_PRIOR, f"{party.strip()} usually makes this"))
+            evidence.append(Evidence(g, W_ARTIST_PRIOR,
+                                     f"{party.strip()} matched a keyword"))
 
     if evidence:
         d = decide(evidence, bpm=bpm)

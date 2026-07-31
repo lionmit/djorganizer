@@ -44,7 +44,8 @@ W_BPM_EXACT = 40
 W_BPM_NEAR = 15
 W_TITLE_KEYWORD = 30
 W_FOLDER = 20
-W_ARTIST_PRIOR = 18
+W_ARTIST_PRIOR = 18       # artist guessed from a keyword, weak
+W_ARTIST_KNOWN = 45       # artist found in a real database, much stronger
 W_MUSICBRAINZ = 35
 
 CONFIDENT = 60          # at or above this, file it without comment
@@ -172,9 +173,21 @@ def decide(evidence: List[Evidence], bpm: Optional[float] = None) -> Decision:
     if runner_up and runner_score >= score * 0.75:
         contested = runner_up
 
-    confidence = min(100, score)
+    # Confidence is about how good the evidence is, not how many points it
+    # happened to score. A single trustworthy source that nothing contradicts
+    # is a confident answer; the old raw-score version reported a correct,
+    # database-backed artist match as 18 out of 100, so almost the whole
+    # library looked like a coin flip and the review flag became noise.
+    best_single = max((e.weight for e in evidence if e.genre == winner),
+                      default=0)
+    agreeing = len([e for e in evidence if e.genre == winner])
+    confidence = best_single + 12 * (agreeing - 1)          # corroboration
+    if runner_up:
+        margin = (score - runner_score) / max(score, 1)     # 0 tie, 1 walkover
+        confidence = int(confidence * (0.55 + 0.45 * margin))
+    confidence = max(5, min(100, int(confidence)))
     if contested:
-        confidence = int(confidence * 0.6)
+        confidence = int(confidence * 0.7)
 
     why = reasons[winner][:3]
     if contested:
