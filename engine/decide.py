@@ -62,8 +62,13 @@ _DASH_CREDIT = re.compile(
     r"-\s*([^-\(\)\[\]]{2,40}?)\s*"
     r"(?:remix|bootleg|edit|flip|rework|refix)\s*$", re.I)
 
-# "A x B", "A vs B", "A & B", "A feat. B"
-_COLLAB = re.compile(r"\s+(?:x|vs\.?|&|feat\.?|ft\.?|with)\s+", re.I)
+# "A x B", "A vs B", "A & B", "A feat. B", and the one that matters most in
+# practice: "A, B, C". Comma-separated credits are the default in download
+# metadata, and missing them meant "Rohaan, yunis, Mat Zo" was unrecognisable
+# even though Mat Zo is a well known artist.
+_COLLAB = re.compile(
+    r"\s*(?:,|;|/|\bx\b|\bvs\.?\b|&|\bfeat\.?\b|\bft\.?\b|"
+    r"\bwith\b|\bpres\.?\b|\band\b)\s*", re.I)
 
 
 @dataclass
@@ -124,8 +129,13 @@ def remix_credit(text: str) -> Optional[str]:
 
 
 def split_collaborators(text: str) -> List[str]:
-    """Every named party on a track, so a collaboration can be seen as one."""
-    parts = [p.strip() for p in _COLLAB.split(text or "") if p.strip()]
+    """Every named party on a track, so a collaboration can be seen as one.
+
+    A one-character fragment is never an artist, and splitting on "and" can
+    cut a real name in half ("Earth, Wind and Fire"), so fragments shorter
+    than three characters are dropped rather than voted on.
+    """
+    parts = [p.strip() for p in _COLLAB.split(text or "") if len(p.strip()) >= 3]
     return parts if len(parts) > 1 else []
 
 

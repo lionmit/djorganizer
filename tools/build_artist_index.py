@@ -80,18 +80,41 @@ def norm(name: str) -> str:
 
 
 def genre_for_tags(tags) -> str | None:
-    """Map MusicBrainz tag names onto our folders, most specific rule first."""
+    """Map MusicBrainz tags onto our folders, weighted by how many people voted.
+
+    An earlier version returned whichever mapping rule matched first, which is
+    an ordering artefact and not an opinion about the artist. It made Bjork
+    hardstyle and Beyonce deep house, because a single niche tag outranked the
+    tag hundreds of people actually agreed on. Votes decide now, and the rule
+    order only breaks ties.
+    """
     if not tags:
         return None
-    joined = " | ".join(
-        t.get("name", "").lower() for t in tags
-        if (t.get("count") or 0) >= MIN_TAG_VOTES or "count" not in t)
-    if not joined.strip(" |"):
+    scores: dict[str, int] = {}
+    order = {tag: i for i, (tag, _) in enumerate(TAG_TO_GENRE)}
+    for t in tags:
+        name = (t.get("name") or "").lower().strip()
+        if not name:
+            continue
+        votes = t.get("count")
+        votes = 1 if votes is None else int(votes)
+        if votes < MIN_TAG_VOTES:
+            continue
+        # Longest matching label wins for this tag, so "deep house" is not
+        # read as "house".
+        best = None
+        for tag, genre in TAG_TO_GENRE:
+            if tag in name and (best is None or len(tag) > len(best[0])):
+                best = (tag, genre)
+        if best:
+            scores[best[1]] = scores.get(best[1], 0) + votes
+    if not scores:
         return None
-    for tag, genre in TAG_TO_GENRE:
-        if tag in joined:
-            return genre
-    return None
+    # Highest vote total wins; a tie falls back to the more specific rule.
+    return max(scores.items(),
+               key=lambda kv: (kv[1], -min(
+                   (order[t] for t, g in TAG_TO_GENRE if g == kv[0]),
+                   default=999)))[0]
 
 
 def main(dump_path: str) -> None:

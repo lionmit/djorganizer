@@ -1690,6 +1690,20 @@ from pathlib import Path as _Path
 
 _INDEX_PATH = _Path(__file__).with_name("artist_index.json.gz")
 _bulk_index = None
+_folded_index = None
+
+import unicodedata as _ud
+
+
+def _fold(name: str) -> str:
+    """Lowercase, collapse spaces and strip accents.
+
+    "Goran Bregović" and "goran bregovic" are the same artist. Without this
+    every accented name in the index was unreachable from a plain filename.
+    """
+    n = _ud.normalize("NFKD", str(name or "").strip().lower())
+    n = "".join(c for c in n if not _ud.combining(c))
+    return " ".join(n.split())
 
 
 def _load_bulk():
@@ -1711,7 +1725,13 @@ def bulk_lookup(name: str):
     idx = _load_bulk()
     if not idx:
         return None
-    key = " ".join(str(name).strip().lower().split())
+    global _folded_index
+    if _folded_index is None:
+        _folded_index = {}
+        for k, v in idx.items():
+            _folded_index.setdefault(_fold(k), v)
+    idx = _folded_index
+    key = _fold(name)
     hit = idx.get(key)
     if hit:
         return hit
