@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from .keywords import GENRE_KEYWORDS as _V19_KEYWORDS
 from .keywords_openformat import OPENFORMAT_KEYWORDS as _OPENFORMAT
 from .genres import CORE_GENRES, LOCALE_GENRES, resolve_genre_key
-from .artists import lookup as artist_lookup
+from .artists import lookup as artist_lookup, bulk_lookup as artist_bulk
 from .decide import (Evidence, decide, remix_credit, split_collaborators,
                      W_REMIX_CREDIT, W_TITLE_KEYWORD, W_ARTIST_PRIOR)
 from .keywords_openformat import (DISNEY_KEYWORDS, DISNEY_REMIX_SIGNALS,
@@ -201,7 +201,10 @@ def _genre_for_text(text: str):
     """
     if not text:
         return None
-    known = artist_lookup(text)
+    known = artist_lookup(text)          # hand-checked, wins
+    if known:
+        return known
+    known = artist_bulk(text)            # bundled MusicBrainz index
     if known:
         return known
     hit = _first_keyword(unicodedata.normalize('NFC', text).lower())

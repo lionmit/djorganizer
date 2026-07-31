@@ -71,7 +71,13 @@ TAG_TO_GENRE = [
     ("funk carioca", "global_bass"), ("baile funk", "global_bass"),
     ("moombahton", "global_bass"),
     ("balkan", "balkan_gypsy"), ("gypsy", "balkan_gypsy"), ("klezmer", "balkan_gypsy"),
-    ("nu metal", "numetal"), ("metal", "numetal"),
+    # Only nu-metal maps to the nu-metal crate. Plain "metal" was sending
+    # every metal band in MusicBrainz there, 30,468 of them.
+    ("nu metal", "numetal"), ("nu-metal", "numetal"),
+    ("rap metal", "numetal"), ("rapcore", "numetal"),
+    ("heavy metal", "rock"), ("death metal", "rock"),
+    ("black metal", "rock"), ("thrash metal", "rock"),
+    ("metalcore", "rock"), ("metal", "rock"),
     ("punk", "rock"), ("hard rock", "rock"), ("classic rock", "rock"),
     ("alternative rock", "indie_altpop"), ("indie rock", "indie_altpop"),
     ("indie pop", "indie_altpop"), ("indie", "indie_altpop"),

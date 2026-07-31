@@ -1670,3 +1670,62 @@ def lookup(name: str):
                 return ARTIST_GENRES[artist_name]
 
     return None
+
+
+# ---------------------------------------------------------------------------
+# Bundled MusicBrainz index, v20.
+#
+# The curated table above is small by nature. This is the bulk layer: an
+# artist-to-genre index extracted from the MusicBrainz JSON dump, which is
+# CC0 and therefore safe to redistribute inside an MIT project. It is loaded
+# lazily and only consulted after the curated table, so a hand-checked entry
+# always wins over a crowd-sourced tag.
+#
+# Built by tools/build_artist_index.py. Absent from a source checkout until
+# that has been run, and the tool works fine without it.
+# ---------------------------------------------------------------------------
+import gzip as _gzip
+import json as _json
+from pathlib import Path as _Path
+
+_INDEX_PATH = _Path(__file__).with_name("artist_index.json.gz")
+_bulk_index = None
+
+
+def _load_bulk():
+    """Read the bundled index once, on first use. Never raises."""
+    global _bulk_index
+    if _bulk_index is None:
+        try:
+            with _gzip.open(_INDEX_PATH, "rt", encoding="utf-8") as fh:
+                _bulk_index = _json.load(fh)
+        except Exception:
+            _bulk_index = {}
+    return _bulk_index
+
+
+def bulk_lookup(name: str):
+    """Genre for an artist from the bundled MusicBrainz index, or None."""
+    if not name:
+        return None
+    idx = _load_bulk()
+    if not idx:
+        return None
+    key = " ".join(str(name).strip().lower().split())
+    hit = idx.get(key)
+    if hit:
+        return hit
+    # "Artist feat. Someone", "Artist & Someone" collapse to the lead name.
+    for sep in (" feat.", " feat ", " ft.", " ft ", " & ", " x ", " vs ", " with "):
+        if sep in key:
+            head = key.split(sep)[0].strip()
+            if len(head) >= 4:
+                hit = idx.get(head)
+                if hit:
+                    return hit
+    return None
+
+
+def index_size() -> int:
+    """How many artists the bundled index knows. 0 if it was never built."""
+    return len(_load_bulk())
