@@ -110,9 +110,13 @@ def create_app(testing=False):
                     tag_genre=metadata.get("genre") or "",
                     duration_seconds=metadata.get("duration"),
                     size_bytes=f.stat().st_size if f.exists() else None,
+                    bpm=metadata.get("bpm"),
                 )
                 tags = tag_file(f, classification, metadata)
-                track_dict = {**tags.__dict__, "filepath": str(tags.filepath)}
+                track_dict = {**tags.__dict__, "filepath": str(tags.filepath),
+                              "confidence": classification.confidence,
+                              "needs_review": classification.needs_review,
+                              "why": classification.rule}
                 tracks.append(track_dict)
 
                 if track_dict["genre"] in ("israeli", "arabic", "russian",

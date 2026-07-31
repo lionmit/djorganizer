@@ -7,6 +7,8 @@ from dataclasses import dataclass
 from .keywords import GENRE_KEYWORDS as _V19_KEYWORDS
 from .keywords_openformat import OPENFORMAT_KEYWORDS as _OPENFORMAT
 from .genres import CORE_GENRES, LOCALE_GENRES, resolve_genre_key
+from .decide import (Evidence, decide, remix_credit, split_collaborators,
+                     W_REMIX_CREDIT, W_TITLE_KEYWORD, W_ARTIST_PRIOR)
 from .keywords_openformat import (DISNEY_KEYWORDS, DISNEY_REMIX_SIGNALS,
                                   DISNEY_COVER_SIGNALS)
 
@@ -138,6 +140,8 @@ GENRE_KEYWORDS = {k: [w.lower() for w in v] for k, v in _build_keyword_table().i
 class ClassificationResult:
     genre: str
     rule: str
+    confidence: int = 100        # how sure, 0 to 100
+    needs_review: bool = False   # show this one to the DJ rather than bury it
 
 def detect_locale(text: str) -> Optional[str]:
     """Detect locale genre from Unicode characters in text."""
@@ -177,6 +181,25 @@ def _has_old_year(name_lower: str) -> bool:
     match = re.search(r'\b(19\d{2})\b', name_lower)
     return match is not None
 
+def _first_keyword(text: str):
+    """The first genre whose keyword appears, walked in priority order."""
+    for genre_key, keywords in GENRE_KEYWORDS.items():
+        if genre_key == "tools":
+            continue
+        for kw in keywords:
+            if kw in text:
+                return genre_key, kw
+    return None
+
+
+def _genre_for_text(text: str):
+    """Best genre for a bare name, used for remixers and each collaborator."""
+    if not text:
+        return None
+    hit = _first_keyword(unicodedata.normalize('NFC', text).lower())
+    return hit[0] if hit else None
+
+
 def _looks_like_a_tool(filepath: Path, duration_seconds=None, size_bytes=None) -> bool:
     """A tool keyword only counts on a file that is actually short or tiny."""
     try:
@@ -193,7 +216,8 @@ def _looks_like_a_tool(filepath: Path, duration_seconds=None, size_bytes=None) -
 
 def classify_file(filepath: Path, artist: str = "", title: str = "",
                   album: str = "", tag_genre: str = "",
-                  duration_seconds=None, size_bytes=None) -> ClassificationResult:
+                  duration_seconds=None, size_bytes=None,
+                  bpm=None) -> ClassificationResult:
     """Classify a single file.
 
     Matching runs against the filename AND the tag fields. Filenames are often
@@ -244,17 +268,43 @@ def classify_file(filepath: Path, artist: str = "", title: str = "",
             if len(label) > 4 and label in tg:
                 return ClassificationResult(bucket, f"Genre tag contains '{label}'")
 
-    # 3. Core genre keywords — first match wins
-    for genre_key, keywords in GENRE_KEYWORDS.items():
-        if genre_key == "tools":
-            continue  # already checked
-        for kw in keywords:
-            if kw in name_lower:
-                return ClassificationResult(genre_key, f"Keyword: '{kw}'")
+    # 3. Everything else is EVIDENCE, not a verdict. Collect what each source
+    #    thinks and let engine.decide weigh it, so a remix credit outranks the
+    #    original artist and BPM can break a collaboration tie. First-match-wins
+    #    misfiled exactly those tracks.
+    evidence = []
 
-    # 4. Classics fallback — year pre-2000, only when no genre keywords matched
+    #    3a. The remixer defines THIS version of the record.
+    who = remix_credit(name) or remix_credit(title)
+    if who:
+        g = _genre_for_text(who)
+        if g:
+            evidence.append(Evidence(g, W_REMIX_CREDIT, f"Remixed by {who}"))
+
+    #    3b. Words in the title and filename.
+    hit = _first_keyword(name_lower)
+    if hit:
+        g, kw = hit
+        evidence.append(Evidence(g, W_TITLE_KEYWORD, f"Matched '{kw}'"))
+
+    #    3c. Each named party votes separately and weakly, so two artists from
+    #        two genres produce a visible contest rather than a silent winner.
+    for party in (split_collaborators(artist) or ([artist] if artist else [])):
+        g = _genre_for_text(party)
+        if g:
+            evidence.append(Evidence(g, W_ARTIST_PRIOR, f"{party.strip()} usually makes this"))
+
+    if evidence:
+        d = decide(evidence, bpm=bpm)
+        if d.genre != "inbox":
+            return ClassificationResult(
+                d.genre, "; ".join(d.reasons),
+                confidence=d.confidence, needs_review=d.needs_review)
+
+    # 4. Era fallback — a pre-2000 year, only when nothing else spoke
     if _has_old_year(name_lower):
-        return ClassificationResult("oldies_motown", "Year pre-2000 in filename")
+        return ClassificationResult("oldies_motown", "Year pre-2000 in filename",
+                                    confidence=25, needs_review=True)
 
     # 5. INBOX — unclassified
     return ClassificationResult("inbox", "No match — manual review needed")
