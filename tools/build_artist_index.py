@@ -51,6 +51,13 @@ from engine.genres import CORE_GENRES           # noqa: E402
 
 OUT = ROOT / "engine" / "artist_index.json.gz"
 
+# Longest label first, so the most specific tag rule matches before a shorter
+# one that happens to be a substring of it. Built once, not per record: with
+# 160 rules and 2.9 million artists, rebuilding it per tag was the difference
+# between a two minute run and a ten minute timeout.
+_BY_LENGTH = sorted(TAG_TO_GENRE, key=lambda kv: -len(kv[0]))
+_ORDER = {tag: i for i, (tag, _) in enumerate(TAG_TO_GENRE)}
+
 # A tag needs at least this many votes to count. Filters out one-person
 # opinions and the long tail of joke tags.
 MIN_TAG_VOTES = 1
@@ -91,7 +98,6 @@ def genre_for_tags(tags) -> str | None:
     if not tags:
         return None
     scores: dict[str, int] = {}
-    order = {tag: i for i, (tag, _) in enumerate(TAG_TO_GENRE)}
     for t in tags:
         name = (t.get("name") or "").lower().strip()
         if not name:
@@ -101,20 +107,16 @@ def genre_for_tags(tags) -> str | None:
         if votes < MIN_TAG_VOTES:
             continue
         # Longest matching label wins for this tag, so "deep house" is not
-        # read as "house".
-        best = None
-        for tag, genre in TAG_TO_GENRE:
-            if tag in name and (best is None or len(tag) > len(best[0])):
-                best = (tag, genre)
-        if best:
-            scores[best[1]] = scores.get(best[1], 0) + votes
+        # read as "house". _BY_LENGTH is sorted longest first and built once,
+        # so the first hit is already the most specific and the scan stops.
+        for tag, genre in _BY_LENGTH:
+            if tag in name:
+                scores[genre] = scores.get(genre, 0) + votes
+                break
     if not scores:
         return None
     # Highest vote total wins; a tie falls back to the more specific rule.
-    return max(scores.items(),
-               key=lambda kv: (kv[1], -min(
-                   (order[t] for t, g in TAG_TO_GENRE if g == kv[0]),
-                   default=999)))[0]
+    return max(scores.items(), key=lambda kv: kv[1])[0]
 
 
 def main(dump_path: str) -> None:
