@@ -1,5 +1,5 @@
 # app.py
-"""DJOrganizer v19 — Flask web server.
+"""DJOrganizer v20 — Flask web server.
 
 PRIVACY-FIRST DESIGN:
 - No telemetry, no analytics, no external calls — runs 100% offline
@@ -407,6 +407,6 @@ if __name__ == "__main__":
         # Pre-fill the folder path so the welcome page can auto-scan
         app.config["PREFILL_PATH"] = folder_path
         url += f"?path={folder_path}"
-    print(f"DJOrganizer v19 running at http://127.0.0.1:{port}")
+    print(f"DJOrganizer v20 running at http://127.0.0.1:{port}")
     webbrowser.open(url)
     app.run(host="127.0.0.1", port=port, debug=False)

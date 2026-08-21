@@ -55,7 +55,7 @@ ALLOWED_CONFIG_KEYS = set(DEFAULT_CONFIG.keys())
 
 def save_config(config: dict, config_file: Path):
     """Save config to key=value file. Only allowed keys are persisted."""
-    lines = ["# DJOrganizer v19 settings — delete this file to reconfigure\n"]
+    lines = ["# DJOrganizer v20 settings — delete this file to reconfigure\n"]
     for key, val in config.items():
         if key not in ALLOWED_CONFIG_KEYS:
             continue

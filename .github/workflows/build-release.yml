@@ -1,0 +1,83 @@
+name: Build DJOrganizer
+
+on:
+  release:
+    types: [created]
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install flask==3.1.0 tinytag==2.0.0 pyinstaller
+
+      - name: Build standalone exe
+        run: python build_standalone.py
+
+      - name: Zip output
+        working-directory: dist
+        run: |
+          $tag = if ($env:GITHUB_EVENT_NAME -eq 'release') { $env:RELEASE_TAG } else { 'dev' }
+          Compress-Archive -Path DJOrganizer -DestinationPath "DJOrganizer-$tag-Windows.zip"
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+
+      - name: Upload to release
+        if: github.event_name == 'release'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: gh release upload $env:RELEASE_TAG "dist/DJOrganizer-$env:RELEASE_TAG-Windows.zip" --clobber
+
+      - name: Upload artifact (manual runs)
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: DJOrganizer-Windows
+          path: dist/DJOrganizer-dev-Windows.zip
+
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install flask==3.1.0 tinytag==2.0.0 pyinstaller
+
+      - name: Build standalone app
+        run: python build_standalone.py
+
+      - name: Zip output
+        working-directory: dist
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          TAG="${RELEASE_TAG:-dev}"
+          zip -r "DJOrganizer-$TAG-macOS.zip" DJOrganizer/
+
+      - name: Upload to release
+        if: github.event_name == 'release'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: gh release upload "$RELEASE_TAG" "dist/DJOrganizer-$RELEASE_TAG-macOS.zip" --clobber
+
+      - name: Upload artifact (manual runs)
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: DJOrganizer-macOS
+          path: dist/DJOrganizer-dev-macOS.zip
