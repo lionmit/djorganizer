@@ -309,7 +309,8 @@ def detect_date_added(filepath: Path) -> str:
 def read_metadata(filepath: Path) -> dict:
     """Read audio metadata via tinytag. Returns dict with None values on failure."""
     empty = {"bpm": None, "key": None, "year": None, "genre": None,
-             "artist": None, "duration": None}
+             "artist": None, "title": None, "album": None, "duration": None,
+             "duration_seconds": None}
     try:
         from tinytag import TinyTag
         tag = TinyTag.get(str(filepath))
@@ -319,7 +320,10 @@ def read_metadata(filepath: Path) -> dict:
             "year":     tag.year,
             "genre":    tag.genre,
             "artist":   tag.artist,
+            "title":    tag.title,
+            "album":    tag.album,
             "duration": _format_duration(tag.duration),
+            "duration_seconds": tag.duration,
         }
     except Exception:
         return empty
@@ -352,16 +356,21 @@ def tag_file(filepath: Path, classification_result, metadata: Optional[dict] = N
     name = filepath.name
     stem = filepath.stem
 
-    # Parse artist / title from "Artist - Title" convention
-    if " - " in stem:
-        artist_part, title_part = stem.split(" - ", 1)
-    else:
+    # Parse artist / title from "Artist - Title" convention.
+    # YouTube rips use en/em dashes ("Artist – Title"), so split on those too.
+    artist_part = ""
+    title_part = ""
+    for sep in (" - ", " – ", " — "):
+        if sep in stem:
+            artist_part, title_part = stem.split(sep, 1)
+            break
+    if not title_part:
         artist_part = metadata.get("artist") or ""
         title_part  = stem
 
-    # Prefer metadata artist when available
+    # Prefer metadata when available; the tag title beats a filename guess
     artist = metadata.get("artist") or artist_part or "Unknown"
-    title  = title_part or stem
+    title  = metadata.get("title") or title_part or stem
 
     # BPM: coerce to float if present
     raw_bpm = metadata.get("bpm")
@@ -371,6 +380,23 @@ def tag_file(filepath: Path, classification_result, metadata: Optional[dict] = N
             bpm = float(raw_bpm)
         except (ValueError, TypeError):
             bpm = None
+
+    # Filename fallbacks: DJ pools write "102 Bpm" and Camelot keys like "(6A)"
+    # into the name. YouTube rips have no ID3 at all, so the name is all we get.
+    if bpm is None:
+        m = re.search(r"\b(\d{2,3})\s*bpm\b", name, re.IGNORECASE)
+        if not m:
+            m = re.search(r"[\s\-_](9\d|1[0-7]\d)(?=\s*(?:-\s*)?$)", stem)
+        if m:
+            candidate = float(m.group(1))
+            if 60 <= candidate <= 200:
+                bpm = candidate
+
+    key = metadata.get("key")
+    if not key:
+        km = re.search(r"\b(1[0-2]|[1-9])([AB])\b", stem)
+        if km:
+            key = km.group(1) + km.group(2)
 
     year = detect_year(name, metadata.get("year"))
 
@@ -385,7 +411,7 @@ def tag_file(filepath: Path, classification_result, metadata: Optional[dict] = N
         year       = year,
         language   = detect_language(name),
         bpm        = bpm,
-        key        = metadata.get("key"),
+        key        = key,
         mix_type   = detect_mix_type(name),
         vocal_type = detect_vocal_type(name),
         duration   = metadata.get("duration"),

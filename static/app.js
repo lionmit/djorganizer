@@ -1,5 +1,5 @@
 /* ============================================================
-   DJOrganizer v20 — app.js
+   DJOrganizer v21 — app.js
    Vanilla JS only. No frameworks.
    All dynamic HTML insertion uses the esc() sanitiser on every
    user-supplied or server-supplied value before embedding in
@@ -345,7 +345,7 @@ function showDropError(msg) {
     if (msg) {
         const wa = el('a', {
             'href': 'https://wa.me/972533558460?text=' + encodeURIComponent(
-                'DJOrganizer v20 (' + (navigator.platform || 'unknown OS') + '): ' + msg),
+                'DJOrganizer v21 (' + (navigator.platform || 'unknown OS') + '): ' + msg),
             'target': '_blank',
             'rel': 'noopener',
             'style': 'display:block;margin-top:0.4rem;font-size:0.8rem;color:var(--teal,#4dd0e1);text-decoration:underline',

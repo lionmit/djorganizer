@@ -1,5 +1,5 @@
 # app.py
-"""DJOrganizer v20 — Flask web server.
+"""DJOrganizer v21 — Flask web server.
 
 PRIVACY-FIRST DESIGN:
 - No telemetry, no analytics, no external calls — runs 100% offline
@@ -88,9 +88,12 @@ def create_app(testing=False):
         session["scanned_source"] = str(source.resolve())
 
         # Collect audio files recursively — skip symlinks to prevent escape
+        # Skip hidden files and macOS AppleDouble shadows ("._Song.mp3"):
+        # FAT/exFAT USB sticks are full of them and they read as fake tracks.
         audio_files = sorted(
             [f for f in source.rglob("*")
-             if f.is_file() and not f.is_symlink() and f.suffix.lower() in AUDIO_EXTS],
+             if f.is_file() and not f.is_symlink() and f.suffix.lower() in AUDIO_EXTS
+             and not f.name.startswith(".")],
             key=lambda x: x.name.lower()
         )
         total = len(audio_files)
@@ -114,7 +117,7 @@ def create_app(testing=False):
                         title=metadata.get("title") or "",
                         album=metadata.get("album") or "",
                         tag_genre=metadata.get("genre") or "",
-                        duration_seconds=metadata.get("duration"),
+                        duration_seconds=metadata.get("duration_seconds"),
                         size_bytes=f.stat().st_size if f.exists() else None,
                         bpm=metadata.get("bpm"),
                     )
@@ -538,6 +541,6 @@ if __name__ == "__main__":
         # Pre-fill the folder path so the welcome page can auto-scan
         app.config["PREFILL_PATH"] = folder_path
         url += f"?path={folder_path}"
-    print(f"DJOrganizer v20 running at http://127.0.0.1:{port}")
+    print(f"DJOrganizer v21 running at http://127.0.0.1:{port}")
     webbrowser.open(url)
     app.run(host="127.0.0.1", port=port, debug=False)
