@@ -98,36 +98,46 @@ def create_app(testing=False):
         def generate():
             tracks = []
             locale_counts = {}
+            skipped = []
+            latest_label = ""
             for i, f in enumerate(audio_files):
-                # Read tags FIRST so the classifier can use artist and title.
-                # Filenames from download sites are often just "(320kbps)".
-                metadata = read_metadata(f)
-                classification = classify_file(
-                    f,
-                    artist=metadata.get("artist") or "",
-                    title=metadata.get("title") or "",
-                    album=metadata.get("album") or "",
-                    tag_genre=metadata.get("genre") or "",
-                    duration_seconds=metadata.get("duration"),
-                    size_bytes=f.stat().st_size if f.exists() else None,
-                    bpm=metadata.get("bpm"),
-                )
-                tags = tag_file(f, classification, metadata)
-                track_dict = {**tags.__dict__, "filepath": str(tags.filepath),
-                              "confidence": classification.confidence,
-                              "needs_review": classification.needs_review,
-                              "why": classification.rule}
-                tracks.append(track_dict)
+                # One unreadable file must never kill the whole scan —
+                # corrupt downloads and half-synced files are normal in a
+                # real DJ library. Classify what we can, list the rest.
+                try:
+                    # Read tags FIRST so the classifier can use artist and title.
+                    # Filenames from download sites are often just "(320kbps)".
+                    metadata = read_metadata(f)
+                    classification = classify_file(
+                        f,
+                        artist=metadata.get("artist") or "",
+                        title=metadata.get("title") or "",
+                        album=metadata.get("album") or "",
+                        tag_genre=metadata.get("genre") or "",
+                        duration_seconds=metadata.get("duration"),
+                        size_bytes=f.stat().st_size if f.exists() else None,
+                        bpm=metadata.get("bpm"),
+                    )
+                    tags = tag_file(f, classification, metadata)
+                    track_dict = {**tags.__dict__, "filepath": str(tags.filepath),
+                                  "confidence": classification.confidence,
+                                  "needs_review": classification.needs_review,
+                                  "why": classification.rule}
+                    tracks.append(track_dict)
+                    latest_label = track_dict["title"]
 
-                if track_dict["genre"] in ("israeli", "arabic", "russian",
-                                           "kpop", "jpop", "bollywood", "turkish"):
-                    locale_counts[track_dict["genre"]] = locale_counts.get(track_dict["genre"], 0) + 1
+                    if track_dict["genre"] in ("israeli", "arabic", "russian",
+                                               "kpop", "jpop", "bollywood", "turkish"):
+                        locale_counts[track_dict["genre"]] = locale_counts.get(track_dict["genre"], 0) + 1
+                except Exception as exc:
+                    skipped.append({"file": f.name, "error": str(exc)[:200]})
+                    latest_label = f"⚠ skipped {f.name}"
 
                 if (i + 1) % 10 == 0 or i == total - 1:
-                    yield f"data: {json.dumps({'type': 'progress', 'current': i + 1, 'total': total, 'latest': track_dict['title']})}\n\n"
+                    yield f"data: {json.dumps({'type': 'progress', 'current': i + 1, 'total': total, 'latest': latest_label})}\n\n"
 
             active_locales = [g for g, c in locale_counts.items() if c >= 5]
-            yield f"data: {json.dumps({'type': 'complete', 'tracks': tracks, 'total': len(tracks), 'active_locales': active_locales, 'source_path': str(source)})}\n\n"
+            yield f"data: {json.dumps({'type': 'complete', 'tracks': tracks, 'total': len(tracks), 'skipped': skipped, 'active_locales': active_locales, 'source_path': str(source)})}\n\n"
 
         return Response(stream_with_context(generate()),
                         mimetype="text/event-stream")

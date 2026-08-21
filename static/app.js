@@ -1,5 +1,5 @@
 /* ============================================================
-   DJOrganizer v19 — app.js
+   DJOrganizer v20 — app.js
    Vanilla JS only. No frameworks.
    All dynamic HTML insertion uses the esc() sanitiser on every
    user-supplied or server-supplied value before embedding in
@@ -394,7 +394,7 @@ function startScan(path) {
                     } catch (_) { /* skip malformed */ }
                 }
                 read();
-            }).catch(err => showScanError('Stream error: ' + err.message));
+            }).catch(err => showScanError('The scan stopped unexpectedly (' + err.message + '). Your files were not touched — try scanning again; if it stops at the same point, a specific file is breaking it and we want to hear about it.'));
         }
         read();
     }).catch(err => showScanError(err.message));
@@ -414,6 +414,7 @@ function startScan(path) {
                 sessionStorage.setItem('dj_tracks', JSON.stringify(evt.tracks));
                 sessionStorage.setItem('dj_source_path', evt.source_path || '');
                 sessionStorage.setItem('dj_active_locales', JSON.stringify(evt.active_locales || []));
+                sessionStorage.setItem('dj_skipped', JSON.stringify(evt.skipped || []));
             } catch (e) {
                 console.warn('sessionStorage write failed:', e);
             }
