@@ -340,6 +340,18 @@ function showDropError(msg) {
     }
     existing.style.color = 'var(--error)';
     existing.textContent = msg;
+    // Every error is a feedback opportunity: one tap opens WhatsApp with
+    // the error details prefilled, so a screenshot is all the user adds.
+    if (msg) {
+        const wa = el('a', {
+            'href': 'https://wa.me/972533558460?text=' + encodeURIComponent(
+                'DJOrganizer v20 (' + (navigator.platform || 'unknown OS') + '): ' + msg),
+            'target': '_blank',
+            'rel': 'noopener',
+            'style': 'display:block;margin-top:0.4rem;font-size:0.8rem;color:var(--teal,#4dd0e1);text-decoration:underline',
+        }, "\uD83D\uDCF8 Stuck? Send this (plus a screenshot) to Lionel's Claude on WhatsApp. It answers, and it fixes things.");
+        existing.appendChild(wa);
+    }
 }
 
 function startScanFromPath() {
@@ -394,7 +406,7 @@ function startScan(path) {
                     } catch (_) { /* skip malformed */ }
                 }
                 read();
-            }).catch(err => showScanError('The scan stopped unexpectedly (' + err.message + '). Your files were not touched — try scanning again; if it stops at the same point, a specific file is breaking it and we want to hear about it.'));
+            }).catch(err => showScanError('The scan stopped unexpectedly (' + err.message + '). Your files were not touched. Try scanning again; if it stops at the same point, a specific file is breaking it and we want to hear about it.'));
         }
         read();
     }).catch(err => showScanError(err.message));
