@@ -132,6 +132,41 @@ def create_app(testing=False):
         return Response(stream_with_context(generate()),
                         mimetype="text/event-stream")
 
+    @app.route("/api/browse", methods=["POST"])
+    def api_browse():
+        """Open the OS-native folder picker and return the chosen path.
+
+        The server runs on the user's own machine, so the dialog opens
+        locally — this is what makes a real Browse button possible at all.
+        """
+        if not check_csrf():
+            return jsonify({"error": "Invalid CSRF token"}), 403
+        folder = pick_folder_native()
+        if not folder:
+            return jsonify({"cancelled": True})
+        return jsonify({"path": folder})
+
+    @app.route("/api/resolve-folder", methods=["POST"])
+    def api_resolve_folder():
+        """Resolve a dragged folder to its absolute path.
+
+        Browsers never reveal the absolute path of a dropped folder, only
+        its name and contents. The page sends the folder name plus a few
+        sample filenames; we search the likely roots on disk for a folder
+        that matches both, which is unambiguous in practice.
+        """
+        if not check_csrf():
+            return jsonify({"error": "Invalid CSRF token"}), 403
+        data = request.get_json() or {}
+        name = (data.get("name") or "").strip()
+        samples = [s for s in (data.get("samples") or [])[:10] if isinstance(s, str)]
+        if not name or "/" in name or "\\" in name or name.startswith("."):
+            return jsonify({"error": "Bad folder name"}), 400
+        match = find_folder_by_content(name, samples)
+        if not match:
+            return jsonify({"error": "not_found"}), 404
+        return jsonify({"path": match})
+
     @app.route("/api/config", methods=["GET"])
     def api_config_get():
         config = load_config(CONFIG_FILE) or DEFAULT_CONFIG.copy()
@@ -358,6 +393,92 @@ def find_free_port(start=5555, max_tries=10):
         except OSError:
             continue
     return start
+
+def pick_folder_native():
+    """Folder picker safe to call from a Flask worker thread.
+
+    macOS and Windows both go through a subprocess, because tkinter must
+    not run outside the main thread (it crashes the app on macOS and
+    misbehaves on Windows when called from a request handler).
+    """
+    import sys
+    import subprocess
+    try:
+        if sys.platform == "darwin":
+            result = subprocess.run(
+                ["osascript", "-e",
+                 'tell application "System Events" to activate\n'
+                 'set theFolder to choose folder with prompt "Select your music folder"\n'
+                 'return POSIX path of theFolder'],
+                capture_output=True, text=True, timeout=300
+            )
+            if result.returncode == 0 and result.stdout.strip():
+                return result.stdout.strip()
+        elif sys.platform == "win32":
+            ps = (
+                "Add-Type -AssemblyName System.Windows.Forms; "
+                "$d = New-Object System.Windows.Forms.FolderBrowserDialog; "
+                "$d.Description = 'Select your music folder'; "
+                "if ($d.ShowDialog() -eq 'OK') { Write-Output $d.SelectedPath }"
+            )
+            result = subprocess.run(
+                ["powershell", "-NoProfile", "-Command", ps],
+                capture_output=True, text=True, timeout=300
+            )
+            if result.returncode == 0 and result.stdout.strip():
+                return result.stdout.strip()
+        else:
+            return pick_folder_gui()
+    except Exception:
+        pass
+    return None
+
+def find_folder_by_content(name, samples, time_budget=6.0):
+    """Find an absolute path for a folder the user dragged into the browser.
+
+    Browsers hand us only the folder's NAME and its file listing, never a
+    path. We walk the places music folders actually live, bounded in depth
+    and time, and confirm a candidate by checking it contains the sample
+    filenames the page sent along.
+    """
+    import time
+    home = Path.home()
+    roots = [home / "Music", home / "Downloads", home / "Desktop",
+             home / "Documents", home]
+    volumes = Path("/Volumes")
+    if volumes.is_dir():
+        roots += [v for v in volumes.iterdir() if v.is_dir()]
+    skip = {"Library", "node_modules", ".git", "Applications",
+            "System", "Photos Library.photoslibrary"}
+    deadline = time.time() + time_budget
+    seen = set()
+    fallback = None
+    for root in roots:
+        if not root.is_dir():
+            continue
+        base_depth = len(root.parts)
+        for dirpath, dirnames, _filenames in os.walk(root):
+            if time.time() > deadline:
+                return fallback
+            dirnames[:] = [d for d in dirnames
+                           if not d.startswith(".") and d not in skip]
+            if len(Path(dirpath).parts) - base_depth >= 5:
+                dirnames[:] = []
+                continue
+            if Path(dirpath).name == name:
+                resolved = str(Path(dirpath).resolve())
+                if resolved in seen:
+                    continue
+                seen.add(resolved)
+                if not samples:
+                    return resolved
+                p = Path(dirpath)
+                hits = sum(1 for s in samples if (p / s).exists())
+                if hits >= max(1, min(2, len(samples))):
+                    return resolved
+                if fallback is None:
+                    fallback = resolved
+    return fallback
 
 def pick_folder_gui():
     """Show a native OS folder picker. Returns path string or None."""

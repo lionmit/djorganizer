@@ -28,10 +28,26 @@
             aria-describedby="drop-zone-hint"
         >
             <span class="drop-icon" aria-hidden="true">🎵</span>
-            <p class="drop-title">Paste your music folder path</p>
+            <p class="drop-title">Drag your music folder here</p>
             <p class="drop-subtitle" id="drop-zone-hint">
-                Supports MP3, WAV, FLAC, AIFF, M4A, OGG
+                …or browse for it, or paste its path. Supports MP3, WAV, FLAC, AIFF, M4A, OGG
             </p>
+
+            <div style="margin-bottom:0.75rem">
+                <button
+                    type="button"
+                    class="btn btn-outline"
+                    id="browse-btn"
+                    onclick="browseFolder()"
+                    aria-label="Browse for your music folder"
+                >
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                    </svg>
+                    Browse…
+                </button>
+            </div>
 
             <div class="path-input-row">
                 <input

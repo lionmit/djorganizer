@@ -188,8 +188,9 @@ function createCleanBadge(val) {
     // Keyboard activation
     zone.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' || e.key === ' ') {
+            if (e.target !== zone) return; // let buttons/inputs inside keep their keys
             e.preventDefault();
-            if (input) input.click();
+            browseFolder();
         }
     });
 
@@ -215,8 +216,13 @@ function createCleanBadge(val) {
                 const entry = items[i].webkitGetAsEntry
                     ? items[i].webkitGetAsEntry() : null;
                 if (entry && entry.isDirectory) {
+                    // Electron-style absolute path, if the environment gives one
                     const file = items[i].getAsFile();
                     if (file && file.path) { startScan(file.path); return; }
+                    // Regular browsers hide the path — resolve it server-side
+                    // from the folder name plus a sample of its filenames.
+                    resolveDroppedFolder(entry);
+                    return;
                 }
             }
         }
@@ -231,7 +237,7 @@ function createCleanBadge(val) {
                 return;
             }
         }
-        showDropError('Could not read folder path. Please use Browse or type the path below.');
+        showDropError('That didn’t look like a folder. Drop a folder, use Browse…, or type the path below.');
     });
 
     if (input) {
@@ -259,6 +265,68 @@ function createCleanBadge(val) {
     }
 })();
 
+/**
+ * resolveDroppedFolder — a dropped folder arrives with no absolute path
+ * (browser security). Read its name and a few of its filenames, then ask
+ * the local server to find the matching folder on disk.
+ */
+function resolveDroppedFolder(entry) {
+    showDropBusy('Locating “' + entry.name + '” on disk…');
+    const reader = entry.createReader();
+    reader.readEntries((entries) => {
+        const samples = entries
+            .filter(en => en.isFile)
+            .slice(0, 10)
+            .map(en => en.name);
+        fetch('/api/resolve-folder', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: entry.name, samples, csrf_token: csrf }),
+        })
+        .then(r => r.json().then(d => ({ ok: r.ok, d })))
+        .then(({ ok, d }) => {
+            if (ok && d.path) { startScan(d.path); return; }
+            showDropError('Couldn’t locate “' + entry.name + '” automatically. Use Browse… or paste its path below.');
+        })
+        .catch(() => showDropError('Couldn’t reach the app. Use Browse… or paste the path below.'));
+    }, () => showDropError('Couldn’t read that folder. Use Browse… or paste the path below.'));
+}
+
+/**
+ * browseFolder — opens the OS-native folder dialog via the local server,
+ * then starts the scan with the returned path.
+ */
+function browseFolder() {
+    const btn = document.getElementById('browse-btn');
+    if (btn) { btn.disabled = true; btn.textContent = 'Opening folder dialog…'; }
+    const restore = () => {
+        if (btn) { btn.disabled = false; btn.innerHTML = btn.dataset.original || 'Browse…'; }
+    };
+    if (btn && !btn.dataset.original) btn.dataset.original = btn.innerHTML;
+    fetch('/api/browse', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ csrf_token: csrf }),
+    })
+    .then(r => r.json().then(d => ({ ok: r.ok, d })))
+    .then(({ ok, d }) => {
+        restore();
+        if (ok && d.path) { startScan(d.path); return; }
+        if (d && d.cancelled) return; // user closed the dialog — not an error
+        showDropError('Couldn’t open the folder dialog. Paste the path below instead.');
+    })
+    .catch(() => { restore(); showDropError('Couldn’t reach the app. Paste the path below instead.'); });
+}
+
+function showDropBusy(msg) {
+    let existing = document.getElementById('drop-error-msg');
+    if (!existing) { showDropError(''); existing = document.getElementById('drop-error-msg'); }
+    if (existing) {
+        existing.style.color = 'var(--text-muted, #9aa0a6)';
+        existing.textContent = msg;
+    }
+}
+
 function showDropError(msg) {
     let existing = document.getElementById('drop-error-msg');
     if (!existing) {
@@ -270,6 +338,7 @@ function showDropError(msg) {
         const zone = document.getElementById('drop-zone');
         if (zone) zone.appendChild(existing);
     }
+    existing.style.color = 'var(--error)';
     existing.textContent = msg;
 }
 
