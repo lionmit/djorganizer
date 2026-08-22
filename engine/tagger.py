@@ -368,9 +368,14 @@ def tag_file(filepath: Path, classification_result, metadata: Optional[dict] = N
         artist_part = metadata.get("artist") or ""
         title_part  = stem
 
-    # Prefer metadata when available; the tag title beats a filename guess
+    # Prefer metadata when available; the tag title beats a filename guess,
+    # EXCEPT when the tag is a generic rip artifact ("Track 07", "01",
+    # "Untitled") — then the filename is the better source.
+    tag_title = metadata.get("title") or ""
+    if re.fullmatch(r"(?i)\s*(?:track\s*)?\d{1,3}\s*|\s*untitled\s*", tag_title):
+        tag_title = ""
     artist = metadata.get("artist") or artist_part or "Unknown"
-    title  = metadata.get("title") or title_part or stem
+    title  = tag_title or title_part or stem
 
     # BPM: coerce to float if present
     raw_bpm = metadata.get("bpm")
@@ -383,10 +388,12 @@ def tag_file(filepath: Path, classification_result, metadata: Optional[dict] = N
 
     # Filename fallbacks: DJ pools write "102 Bpm" and Camelot keys like "(6A)"
     # into the name. YouTube rips have no ID3 at all, so the name is all we get.
+    # Kept deliberately strict — a bare trailing number is only trusted after a
+    # pool marker (INTRO/OUTRO/CLEAN/DIRTY), otherwise "Anthem 99" gets a fake BPM.
     if bpm is None:
-        m = re.search(r"\b(\d{2,3})\s*bpm\b", name, re.IGNORECASE)
-        if not m:
-            m = re.search(r"[\s\-_](9\d|1[0-7]\d)(?=\s*(?:-\s*)?$)", stem)
+        m = (re.search(r"(?:^|[\s\-_(\[])(\d{2,3})\s*bpm\b", name, re.IGNORECASE)
+             or re.search(r"[(\[](9\d|1[0-7]\d)[)\]]", stem)
+             or re.search(r"(?i)(?:intro|outro|clean|dirty)\s*-?\s*(9\d|1[0-7]\d)\s*$", stem))
         if m:
             candidate = float(m.group(1))
             if 60 <= candidate <= 200:
@@ -394,7 +401,7 @@ def tag_file(filepath: Path, classification_result, metadata: Optional[dict] = N
 
     key = metadata.get("key")
     if not key:
-        km = re.search(r"\b(1[0-2]|[1-9])([AB])\b", stem)
+        km = re.search(r"[(\[](1[0-2]|[1-9])([AB])[)\]]", stem)
         if km:
             key = km.group(1) + km.group(2)
 
